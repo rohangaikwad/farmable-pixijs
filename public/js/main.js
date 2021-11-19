@@ -21,7 +21,7 @@ PIXI.Loader.shared.add(["images/icon.png", "images/arrow.svg"]).load(setup);
 let folder;
 function setup() {
     //Create the cat sprite
-    folder = new PIXI.Sprite(PIXI.Loader.shared.resources["images/arrow.svg"].texture);
+    folder = new PIXI.Sprite(PIXI.Loader.shared.resources["images/icon.png"].texture);
 
     //   folder.x = 30;
     //   folder.y = 30;
@@ -38,7 +38,7 @@ function setup() {
     //app.ticker.add((delta) => gameLoop(delta));
 
     gsap.to(folder, 1, {
-        pixi: { scaleX: 2 },
+        pixi: { scaleX: 2, x: 100, y: 50, rotation: 90 },
         yoyo: true,
         repeat: -1
     });
