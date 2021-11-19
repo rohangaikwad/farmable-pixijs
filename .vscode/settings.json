@@ -1,0 +1,9 @@
+{
+    "path-intellisense.mappings": {
+        "~": "${workspaceRoot}/public"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    }
+}
