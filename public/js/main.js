@@ -307,6 +307,17 @@ function setup() {
     const tri3 = createTriangle(159, 115 + lItemH * 2);
     const tri4 = createTriangle(159, 115 + lItemH * 3);
     const tri5 = createTriangle(159, 115 + lItemH * 4);
+    const tri6 = createTriangle(159, 395 + lItemH / 2, 0xd0421f);
+    const tri7 = createTriangle(325, 289, 0xd0421f);
+    tri7.scale.set(-1, 1);
+
+    const rTri1 = createTriangle(430, 231);
+    const rTri2 = createTriangle(430, 231);
+    const rTri3 = createTriangle(430, 231);
+
+    const rTri4 = createTriangle(430, 259, 0xd0421f);
+    const rTri5 = createTriangle(430, 259, 0xd0421f);
+    const rTri6 = createTriangle(430, 259, 0xd0421f);
 
     //app.ticker.add((delta) => gameLoop(delta));
 
@@ -344,58 +355,149 @@ function setup() {
     let len = l1PathPts.length;
     let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
 
-    gsap.timeline({ repeat: -1 }).to(tri1, {
-        duration: arrDuration1,
-        ease: "none",
-        //repeat: -1,
-        motionPath: {
-            autoRotate: 0,
-            path: l1PathPts.join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-            useRadians: true
-        }
-    });
-
-    gsap.timeline({ repeat: -1 }).to(tri2, {
-        duration: arrDuration1,
-        ease: "none",
-        //repeat: -1,
-        motionPath: {
-            autoRotate: 0,
-            path: line2.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-            useRadians: true
-        }
-    });
-
-    gsap.timeline({ repeat: -1 }).to(tri3, {
-        duration: arrDuration1,
-        ease: "none",
-        //repeat: -1,
-        motionPath: {
-            autoRotate: 0,
-            path: line3.path.split(" ").join(" "),
-            useRadians: true
-        }
-    });
-
-    gsap.timeline({ repeat: -1 }).to(tri4, {
-        duration: arrDuration1,
-        ease: "none",
-        motionPath: {
-            autoRotate: 0,
-            path: line4.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-            useRadians: true
-        }
-    });
-
-    gsap.timeline({ repeat: -1 }).to(tri5, {
-        duration: arrDuration1,
-        ease: "none",
-        motionPath: {
-            autoRotate: 0,
-            path: line5.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-            useRadians: true
-        }
-    });
+    gsap.timeline({ repeat: -1 })
+        .to(tri1, {
+            duration: arrDuration1,
+            ease: "none",
+            //repeat: -1,
+            motionPath: {
+                autoRotate: 0,
+                path: l1PathPts.join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                useRadians: true
+            }
+        })
+        .to(
+            tri2,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                //repeat: -1,
+                motionPath: {
+                    autoRotate: 0,
+                    path: line2.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            0
+        )
+        .to(
+            tri3,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                //repeat: -1,
+                motionPath: {
+                    autoRotate: 0,
+                    path: line3.path.split(" ").join(" "),
+                    useRadians: true
+                }
+            },
+            0
+        )
+        .to(
+            tri4,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: line4.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            0
+        )
+        .to(
+            tri5,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: line5.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            0
+        )
+        .to(
+            rTri1,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: rLine1.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            arrDuration1
+        )
+        .to(
+            rTri2,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: rLine2.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            arrDuration1
+        )
+        .to(
+            rTri3,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: rLine3.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            arrDuration1
+        )
+        .to(
+            rTri4,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: rLine4.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            arrDuration1
+        )
+        .to(
+            rTri5,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: rLine5.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            arrDuration1
+        )
+        .to(
+            rTri6,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: rLine6.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            arrDuration1
+        );
 
     // MotionPathHelper.create("#arrow", {
     //     path: path1
