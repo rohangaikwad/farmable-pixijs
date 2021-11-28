@@ -78,7 +78,9 @@ let createCircle = (fill, radius, x = 10, y = 10, lineFill = 0xffffff, lineWidth
 let createTriangle = (x = 0, y = 0, fill = 0x1b823a) => {
     let tri1 = new PIXI.Graphics();
     tri1.beginFill(fill);
-    tri1.drawPolygon([0, -9, 15, 0, 0, 9, 3, 0]);
+    let w = 15;
+    let h = 18;
+    tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
     tri1.endFill();
     tri1.x = x;
     tri1.y = y;
@@ -87,18 +89,65 @@ let createTriangle = (x = 0, y = 0, fill = 0x1b823a) => {
     return tri1;
 };
 
+let drawLine = (style, pos, points) => {
+    let line = new PIXI.Graphics();
+    line.lineStyle(style); //eaf3ee
+    line.moveTo(points[0].x, points[0].y);
+
+    let path = `M${points[0].x + pos.x},${points[0].y + pos.y} `;
+
+    points.forEach((pt, i) => {
+        if (i === 0) return;
+        if (pt.curve) {
+            //line.moveTo(pt.x - pt.curve, points[0].y);
+            let ppt = points[i - 1];
+            let npt = points[i + 1];
+
+            let prevPtX = pt.x !== ppt.x ? pt.x + (ppt.x > pt.x ? pt.curve : -pt.curve) : pt.x;
+            let prevPtY = pt.y !== ppt.y ? pt.y + (ppt.y > pt.y ? pt.curve : -pt.curve) : pt.y;
+            //console.log("prev", prevPtX, prevPtY);
+            let nextPtX = pt.x !== npt.x ? pt.x + (npt.x > pt.x ? pt.curve : -pt.curve) : pt.x;
+            let nextPtY = pt.y !== npt.y ? pt.y + (npt.y > pt.y ? pt.curve : -pt.curve) : pt.y;
+            //console.log("next", nextPtX, nextPtY);
+
+            line.lineTo(prevPtX, prevPtY);
+            line.quadraticCurveTo(pt.x, pt.y, nextPtX, nextPtY);
+
+            path += `L${prevPtX + pos.x},${prevPtY + pos.y} `;
+            path += `Q${pt.x + pos.x},${pt.y + pos.y} ${nextPtX + pos.x},${nextPtY + pos.y} `;
+        } else {
+            line.lineTo(pt.x, pt.y);
+            path += `L${pt.x + pos.x},${pt.y + pos.y} `;
+        }
+    });
+
+    line.x = pos.x;
+    line.y = pos.y;
+    app.stage.addChild(line);
+
+    //console.log(path);
+    return { obj: line, path };
+};
+
 let folder;
 function setup() {
+    let logoBgCircle1 = createCircle(0xcf421f, 42, 373.5, 248.5, 0x1b823a, 0);
+    logoBgCircle1.alpha = 0.1;
+    let logoBgCircle2 = createCircle(0xcf421f, 34, 373.5, 248.5, 0x1b823a, 0);
+    logoBgCircle2.alpha = 0.1;
+    let logoBgCircle3 = createCircle(0xcf421f, 26, 373.5, 248.5, 0x1b823a, 0);
+    logoBgCircle3.alpha = 0.1;
+
     //Create the cat sprite
     folder = new PIXI.Sprite(PIXI.Loader.shared.resources["images/logo.png"].texture);
 
     //   folder.x = 30;
     //   folder.y = 30;
-    folder.position.set(cw * 0.389, ch * 0.413);
+    folder.position.set(373.5, 248.5);
     //folder.scale.set(0.6, 0.6);
     folder.anchor.set(0.5, 0.5);
-    folder.width = 40;
-    folder.height = 40;
+    folder.width = folder.height = 52;
+    //folder.height = 40;
     //folder.angle = 270;
     // folder.vx = 0;
     // folder.vy = 0;
@@ -130,104 +179,122 @@ function setup() {
     leftItem7.position.set(55, 470);
 
     let color_lightGreen = 0xdcede3;
-
-    let lineStyle = { width: 3, color: 0x1b823a, alpha: 1 };
-    let bgLineStyle = { width: 20, color: color_lightGreen, alpha: 1 };
-
-    {
-        const line1bg = new PIXI.Graphics();
-        line1bg.lineStyle(bgLineStyle); //eaf3ee
-        line1bg.moveTo(0, 0);
-        line1bg.lineTo(75, 0);
-        line1bg.quadraticCurveTo(90, 0, 90, 15);
-        line1bg.lineTo(90, 116 + lItemH * 2 - 15);
-        line1bg.quadraticCurveTo(90, 116 + lItemH * 2, 75, 116 + lItemH * 2);
-        line1bg.lineTo(65, 116 + lItemH * 2);
-        line1bg.lineTo(0, 116 + lItemH * 2);
-        line1bg.x = 159;
-        line1bg.y = 115;
-        app.stage.addChild(line1bg);
-
-        const line2bg = new PIXI.Graphics();
-        line2bg.lineStyle(bgLineStyle);
-        line2bg.moveTo(0, 0);
-        line2bg.lineTo(90, 0);
-        line2bg.x = 159;
-        line2bg.y = 115 + lItemH * 1;
-        app.stage.addChild(line2bg);
-
-        const line3bg = new PIXI.Graphics();
-        line3bg.lineStyle(bgLineStyle);
-        line3bg.moveTo(0, 0);
-        line3bg.lineTo(165, 0);
-        line3bg.x = 159;
-        line3bg.y = 115 + lItemH * 2;
-        app.stage.addChild(line3bg);
-
-        const line4bg = new PIXI.Graphics();
-        line4bg.lineStyle(bgLineStyle);
-        line4bg.moveTo(0, 0);
-        line4bg.lineTo(90, 0);
-        line4bg.x = 159;
-        line4bg.y = 115 + lItemH * 3;
-        app.stage.addChild(line4bg);
-    }
-
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 0);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 1);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 2);
+    createCircle(color_lightGreen, 10, 159 + 160, 115 + lItemH * 2);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 3);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 4);
 
-    const line1 = new PIXI.Graphics();
-    line1.lineStyle(lineStyle);
-    line1.moveTo(0, 0);
-    line1.lineTo(75, 0);
-    line1.quadraticCurveTo(90, 0, 90, 15);
-    line1.lineTo(90, 116 - 15);
-    line1.quadraticCurveTo(90, 116, 90 + 15, 116);
-    //line1.lineTo(165, 116);
-    line1.x = 159;
-    line1.y = 115;
-    app.stage.addChild(line1);
+    let bgLineStyle = { width: 20, color: color_lightGreen, alpha: 1 };
+    let lineStyle = { width: 2.5, color: 0x1b823a, alpha: 1 };
+    let bgLineStyle2 = { width: 20, color: 0xeadcd8, alpha: 1 };
+    let lineStyle2 = { width: 2.5, color: 0xd0421f, alpha: 1 };
+    let thinLineCurve = 20;
+    let leftLineX1 = 90;
+    let leftLineX2 = 160;
 
-    const line2 = new PIXI.Graphics();
-    line2.lineStyle(lineStyle);
-    line2.moveTo(0, 0);
-    line2.lineTo(75, 0);
-    line2.quadraticCurveTo(90, 0, 90, 15);
-    line2.x = 159;
-    line2.y = 115 + lItemH * 1;
-    app.stage.addChild(line2);
+    let line1Path = [
+        { x: 0, y: 0 },
+        { x: leftLineX1, y: 0, curve: thinLineCurve },
+        { x: leftLineX1, y: lItemH * 2, curve: thinLineCurve },
+        { x: leftLineX2, y: lItemH * 2 }
+    ];
+    let line2Path = [
+        { x: 0, y: 0 },
+        { x: leftLineX1, y: 0, curve: thinLineCurve },
+        { x: leftLineX1, y: lItemH, curve: thinLineCurve },
+        { x: leftLineX2, y: lItemH }
+    ];
+    let line3Path = [
+        { x: 0, y: 0 },
+        { x: leftLineX1, y: 0 },
+        { x: leftLineX2, y: 0 }
+    ];
+    let line4Path = [
+        { x: 0, y: 0 },
+        { x: leftLineX1, y: 0, curve: thinLineCurve },
+        { x: leftLineX1, y: -lItemH, curve: thinLineCurve },
+        { x: leftLineX2, y: -lItemH }
+    ];
+    let line5Path = [
+        { x: 0, y: 0 },
+        { x: leftLineX1, y: 0, curve: thinLineCurve },
+        { x: leftLineX1, y: -lItemH * 2, curve: thinLineCurve },
+        { x: leftLineX2, y: -lItemH * 2 }
+    ];
 
-    const line3 = new PIXI.Graphics();
-    line3.lineStyle(lineStyle);
-    line3.moveTo(0, 0);
-    line3.lineTo(90, 0);
-    line3.lineTo(165, 0);
-    line3.x = 159;
-    line3.y = 115 + lItemH * 2;
-    app.stage.addChild(line3);
+    let line6Path = [
+        { x: 0, y: 0 },
+        { x: 118, y: 0, curve: 10 },
+        { x: 118, y: -165, curve: 10 },
+        { x: leftLineX2, y: -165 }
+    ];
 
-    const line4 = new PIXI.Graphics();
-    line4.lineStyle(lineStyle);
-    line4.moveTo(0, 0);
-    line4.lineTo(75, 0);
-    line4.quadraticCurveTo(90, 0, 90, -15);
-    line4.x = 159;
-    line4.y = 115 + lItemH * 3;
-    app.stage.addChild(line4);
+    let line7Path = [
+        { x: 0, y: 0 },
+        { x: 105, y: 0, curve: 10 },
+        { x: 105, y: -205, curve: 10 },
+        { x: 132, y: -205 }
+    ];
 
-    const line5 = new PIXI.Graphics();
-    line5.lineStyle(lineStyle);
-    line5.moveTo(0, 0);
-    line5.lineTo(75, 0);
-    line5.quadraticCurveTo(90, 0, 90, -15);
-    line5.lineTo(90, -116 + 15);
-    line5.quadraticCurveTo(90, -116, 90 + 15, -116);
-    line5.x = 159;
-    line5.y = 115 + lItemH * 4;
-    app.stage.addChild(line5);
+    let rightLine1Path = [
+        { x: 0, y: 0 },
+        { x: 48, y: 0, curve: 10 },
+        { x: 48, y: -150, curve: 10 },
+        { x: 145, y: -150 }
+    ];
+    let rightLine2Path = [
+        { x: 0, y: 0 },
+        { x: 48, y: 0, curve: 10 },
+        { x: 48, y: -97, curve: 10 },
+        { x: 145, y: -97 }
+    ];
+    let rightLine3Path = [
+        { x: 0, y: 0 },
+        { x: 48, y: 0, curve: 10 },
+        { x: 48, y: -44, curve: 10 },
+        { x: 145, y: -44 }
+    ];
+    let rightLine4Path = [
+        { x: 0, y: 0 },
+        { x: 145, y: 0 }
+    ];
+    let rightLine5Path = [
+        { x: 0, y: 0 },
+        { x: 48, y: 0, curve: 10 },
+        { x: 48, y: 97, curve: 10 },
+        { x: 145, y: 97 }
+    ];
+    let rightLine6Path = [
+        { x: 0, y: 0 },
+        { x: 48, y: 0, curve: 10 },
+        { x: 48, y: 193, curve: 10 },
+        { x: 145, y: 193 }
+    ];
+
+    let bgLine1 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 0 }, line1Path);
+    let bgLine2 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 1 }, line2Path);
+    let bgLine3 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 2 }, line3Path);
+    let bgLine4 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 3 }, line4Path);
+    let bgLine5 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 4 }, line5Path);
+    let bgLine6 = drawLine(bgLineStyle2, { x: 159, y: 395 + lItemH / 2 }, line6Path);
+    let bgLine7 = drawLine(bgLineStyle2, { x: 199, y: 465 + lItemH / 2 }, line7Path);
+
+    let line1 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 0 }, line1Path);
+    let line2 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 1 }, line2Path);
+    let line3 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 2 }, line3Path);
+    let line4 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 3 }, line4Path);
+    let line5 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 4 }, line5Path);
+    let line6 = drawLine(lineStyle2, { x: 159, y: 395 + lItemH / 2 }, line6Path);
+    let line7 = drawLine(lineStyle2, { x: 199, y: 465 + lItemH / 2 }, line7Path);
+
+    let rLine1 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine1Path);
+    let rLine2 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine2Path);
+    let rLine3 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine3Path);
+    let rLine4 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine4Path);
+    let rLine5 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine5Path);
+    let rLine6 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine6Path);
 
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, 0x1b823a, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, 0x1b823a, 2.5);
@@ -235,19 +302,34 @@ function setup() {
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 3, 0x1b823a, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 4, 0x1b823a, 2.5);
 
-    const tri1 = createTriangle(170, 106);
-    const tri2 = createTriangle(170, 106 + lItemH * 1);
-    const tri3 = createTriangle(170, 106 + lItemH * 2);
-    const tri4 = createTriangle(170, 106 + lItemH * 3);
-    const tri5 = createTriangle(170, 106 + lItemH * 4);
+    const tri1 = createTriangle(159, 115);
+    const tri2 = createTriangle(159, 115 + lItemH * 1);
+    const tri3 = createTriangle(159, 115 + lItemH * 2);
+    const tri4 = createTriangle(159, 115 + lItemH * 3);
+    const tri5 = createTriangle(159, 115 + lItemH * 4);
 
     //app.ticker.add((delta) => gameLoop(delta));
 
-    gsap.to(folder, {
-        pixi: { scale: 0.16, duration: 1 },
-        yoyo: true,
-        repeat: -1
-    });
+    // gsap.to(logoBgCircle1, {
+    //     pixi: { scale: 1.15 },
+    //     duration: 0.5,
+    //     yoyo: true,
+    //     delay: 0.1,
+    //     repeat: -1
+    // });
+    // gsap.to(logoBgCircle2, {
+    //     pixi: { scale: 1.2 },
+    //     duration: 0.5,
+    //     yoyo: true,
+    //     delay: 0.05,
+    //     repeat: -1
+    // });
+    // gsap.to(logoBgCircle3, {
+    //     pixi: { scale: 1.25 },
+    //     duration: 0.5,
+    //     yoyo: true,
+    //     repeat: -1
+    // });
 
     // gsap.fromTo(
     //     tri1,
@@ -255,91 +337,65 @@ function setup() {
     //     { pixi: { x: 220 }, yoyo: false, repeat: -1, duration: 2 }
     // );
 
-    let arrDuration = 3;
+    let arrDuration1 = 1.5;
+    let arrDuration2 = arrDuration1 / 3;
 
-    gsap.timeline({ repeat: -1 })
-        .to(tri1, {
-            duration: 1.5,
-            ease: "none",
-            //repeat: -1,
-            motionPath: {
-                //alignOrigin: [0.5, 0.5],
-                autoRotate: 0,
-                path: "M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                useRadians: true
-            }
-        })
-        .to(tri1, {
-            duration: 0.5,
-            ease: "none",
-            //repeat: -1,
-            motionPath: {
-                //alignOrigin: [0.5, 0.5],
-                autoRotate: 0,
-                path: "M268,231 h45",
-                useRadians: true
-            }
-        });
+    let l1PathPts = line1.path.split(" ").filter((p) => p !== "");
+    let len = l1PathPts.length;
+    let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
 
-    // gsap.to(tri1, {
-    //     duration: arrDuration,
-    //     ease: "none",
-    //     repeat: -1,
-    //     motionPath: {
-    //         //alignOrigin: [0.5, 0.5],
-    //         autoRotate: 0,
-    //         path: "M159,115 h70 c20,0 20,0 20,20 v96 h75",
-    //         useRadians: true
-    //     }
-    // });
+    gsap.timeline({ repeat: -1 }).to(tri1, {
+        duration: arrDuration1,
+        ease: "none",
+        //repeat: -1,
+        motionPath: {
+            autoRotate: 0,
+            path: l1PathPts.join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+            useRadians: true
+        }
+    });
 
-    // gsap.to(tri2, {
-    //     duration: arrDuration,
-    //     ease: "none",
-    //     repeat: -1,
-    //     motionPath: {
-    //         //alignOrigin: [0.5, 0.5],
-    //         autoRotate: 0,
-    //         path: "M159,174 h90 v57 h75",
-    //         useRadians: true
-    //     }
-    // });
+    gsap.timeline({ repeat: -1 }).to(tri2, {
+        duration: arrDuration1,
+        ease: "none",
+        //repeat: -1,
+        motionPath: {
+            autoRotate: 0,
+            path: line2.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+            useRadians: true
+        }
+    });
 
-    // gsap.to(tri3, {
-    //     duration: arrDuration,
-    //     ease: "none",
-    //     repeat: -1,
-    //     motionPath: {
-    //         //alignOrigin: [0.5, 0.5],
-    //         autoRotate: 0,
-    //         path: "M159,231 h90 h75",
-    //         useRadians: true
-    //     }
-    // });
+    gsap.timeline({ repeat: -1 }).to(tri3, {
+        duration: arrDuration1,
+        ease: "none",
+        //repeat: -1,
+        motionPath: {
+            autoRotate: 0,
+            path: line3.path.split(" ").join(" "),
+            useRadians: true
+        }
+    });
 
-    // gsap.to(tri4, {
-    //     duration: arrDuration,
-    //     ease: "none",
-    //     repeat: -1,
-    //     motionPath: {
-    //         //alignOrigin: [0.5, 0.5],
-    //         autoRotate: 0,
-    //         path: "M159,289 h90 v-57 h75",
-    //         useRadians: true
-    //     }
-    // });
+    gsap.timeline({ repeat: -1 }).to(tri4, {
+        duration: arrDuration1,
+        ease: "none",
+        motionPath: {
+            autoRotate: 0,
+            path: line4.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+            useRadians: true
+        }
+    });
 
-    // gsap.to(tri5, {
-    //     duration: arrDuration,
-    //     ease: "none",
-    //     repeat: -1,
-    //     motionPath: {
-    //         //alignOrigin: [0.5, 0.5],
-    //         autoRotate: 0,
-    //         path: "M159,347 h70 c20,0 20,0 20,-20 v-96 h75",
-    //         useRadians: true
-    //     }
-    // });
+    gsap.timeline({ repeat: -1 }).to(tri5, {
+        duration: arrDuration1,
+        ease: "none",
+        motionPath: {
+            autoRotate: 0,
+            path: line5.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+            useRadians: true
+        }
+    });
 
     // MotionPathHelper.create("#arrow", {
     //     path: path1
