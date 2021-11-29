@@ -1,2 +1,2 @@
-*{box-sizing:border-box}body{margin:0}.bg{text-align:center}#cunt,.bg{margin:0 auto}#cunt{background-color:#f1f1f1;display:block;height:602px;position:relative;width:960px}#cunt img{opacity:1}#cunt .animCont,#cunt canvas{height:100%;left:0;position:absolute;top:0;width:100%}
+*{box-sizing:border-box}body{background-color:#f1f1f1;margin:0}.bg{text-align:center}#cunt,.bg{margin:0 auto}#cunt{background-color:#fff;display:block;height:602px;position:relative;width:960px}#cunt img{opacity:0;width:100%}#cunt .animCont,#cunt canvas{height:100%;left:0;position:absolute;top:0;width:100%}
 /*# sourceMappingURL=style.css.map */

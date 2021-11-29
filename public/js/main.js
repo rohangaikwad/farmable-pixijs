@@ -14,6 +14,11 @@ console.log(type);
 const cw = 960;
 const ch = 602;
 
+let color_lightGreen = 0xf0f8f4;
+let color_darkGreen = 0x00843d;
+let color_darkOrange = 0xcf4520;
+let color_lightOrange = 0xfcf4f2;
+
 const app = new PIXI.Application({
     width: 960,
     height: 602,
@@ -24,9 +29,36 @@ const app = new PIXI.Application({
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.getElementById("cunt").appendChild(app.view);
 //PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-PIXI.Loader.shared.add(["images/logo.png", "images/arrow.svg"]).load(setup);
+let imageAliases = [
+    "logo.png",
+    "arrow.svg",
+    "l_icon_1.svg",
+    "l_icon_2.svg",
+    "l_icon_3.svg",
+    "l_icon_4.svg",
+    "l_icon_5.svg",
+    "l_icon_6.svg",
+    "l_icon_7.svg",
+    "r_icon_1.svg",
+    "r_icon_2.svg",
+    "r_icon_3.svg",
+    "r_icon_11.svg",
+    "r_icon_21.svg",
+    "r_icon_31.svg",
+    "logo_mobile_app.svg",
+    "logo_web_portal.svg"
+];
+
+let images = imageAliases.map((i) => `images/${i}`);
+console.log(images);
+PIXI.Loader.shared.add(images).load(setup);
 
 //This `setup` function will run when the image has loaded
+
+let GetSprite = (alias) => {
+    let imageAlias = imageAliases.filter((img) => img.split(".")[0] === alias)[0];
+    return new PIXI.Sprite(PIXI.Loader.shared.resources[`images/${imageAlias}`].texture);
+};
 
 let createIconTextGroupItem = (textStr, textureName) => {
     let container = new PIXI.Container();
@@ -35,15 +67,16 @@ let createIconTextGroupItem = (textStr, textureName) => {
     let containerH = 50;
 
     const rectangle = new PIXI.Graphics();
-    rectangle.beginFill(0xfc9f3c);
+    rectangle.lineStyle({ width: 2, color: 0xf1f1f1, alpha: 1 });
+    rectangle.beginFill(0xffffff);
     rectangle.drawRoundedRect(0, 0, containerW, containerH, 7);
     rectangle.endFill();
     container.addChild(rectangle);
 
-    let icon = new PIXI.Sprite(PIXI.Loader.shared.resources[textureName].texture);
+    let icon = GetSprite(textureName); // new PIXI.Sprite(PIXI.Loader.shared.resources[textureName].texture);
     icon.anchor.set(0.5, 0.5);
-    icon.width = 25;
-    icon.height = 25;
+    icon.width = (icon.width / icon.height) * 20;
+    icon.height = 20;
     icon.position.set(20, containerH / 2);
     container.addChild(icon);
 
@@ -63,6 +96,24 @@ let createIconTextGroupItem = (textStr, textureName) => {
     return container;
 };
 
+let createText = (textStr, txtColor, x, y) => {
+    const textLabel = new PIXI.Text(textStr, {
+        fontFamily: "Arial",
+        fontSize: 16,
+        fontWeight: 600,
+        fill: txtColor,
+        wordWrap: true,
+        wordWrapWidth: 360,
+        align: "left"
+    });
+    textLabel.anchor.set(0, 0.5);
+    textLabel.x = x;
+    textLabel.y = y;
+
+    app.stage.addChild(textLabel);
+    return textLabel;
+};
+
 let createCircle = (fill, radius, x = 10, y = 10, lineFill = 0xffffff, lineWidth = 0) => {
     const circle = new PIXI.Graphics();
     circle.lineStyle({ width: lineWidth, color: lineFill, alpha: 1 });
@@ -75,12 +126,17 @@ let createCircle = (fill, radius, x = 10, y = 10, lineFill = 0xffffff, lineWidth
     return circle;
 };
 
-let createTriangle = (x = 0, y = 0, fill = 0x1b823a) => {
+let createTriangle = (x = 0, y = 0, fill = 0x1b823a, reverse = false) => {
     let tri1 = new PIXI.Graphics();
     tri1.beginFill(fill);
     let w = 15;
     let h = 18;
-    tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
+    if (reverse) {
+        tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
+        //tri1.drawPolygon([w / 2, -h / 2, -w / 2, 0, w / 2, h / 2, w / 2 - 3, 0]);
+    } else {
+        tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
+    }
     tri1.endFill();
     tri1.x = x;
     tri1.y = y;
@@ -129,21 +185,106 @@ let drawLine = (style, pos, points) => {
     return { obj: line, path };
 };
 
+let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
+    let container = new PIXI.Container();
+    let lineStyle3 = { width: 1, color: color_darkOrange, alpha: 1 };
+    let boxOutline = drawLine(lineStyle3, { x: 0, y: 0 }, [
+        { x: 0, y: 0 },
+        { x: 341, y: 0, curve: 22 },
+        { x: 341, y: 83, curve: 22 },
+        { x: 0, y: 83 },
+        { x: 0, y: 0 }
+    ]);
+    container.addChild(boxOutline.obj);
+
+    let boxLine1 = drawLine(lineStyle3, { x: 10, y: 35 }, [
+        { x: 0, y: 0 },
+        { x: 320, y: 0 }
+    ]);
+    container.addChild(boxLine1.obj);
+
+    const mainText = new PIXI.Text(t1, {
+        fontFamily: "Arial",
+        fontSize: 16,
+        fontWeight: 500,
+        fill: color_darkOrange,
+        wordWrap: true,
+        wordWrapWidth: 360,
+        align: "left"
+    });
+    mainText.anchor.set(0, 0.5);
+    mainText.x = 40;
+    mainText.y = 18;
+    container.addChild(mainText);
+
+    const txt1 = new PIXI.Text(t2, {
+        fontFamily: "Arial",
+        fontSize: 14,
+        fontWeight: 500,
+        fill: color_darkOrange,
+        wordWrap: true,
+        wordWrapWidth: 110,
+        align: "left"
+    });
+    txt1.anchor.set(0, 0.5);
+    txt1.x = 40;
+    txt1.y = 57;
+    container.addChild(txt1);
+
+    const txt2 = new PIXI.Text(t3, {
+        fontFamily: "Arial",
+        fontSize: 14,
+        fontWeight: 500,
+        fill: color_darkOrange,
+        wordWrap: true,
+        wordWrapWidth: 130,
+        align: "left"
+    });
+    txt2.anchor.set(0, 0.5);
+    txt2.x = 200;
+    txt2.y = 57;
+    container.addChild(txt2);
+
+    let mainImg = GetSprite(i1);
+    mainImg.anchor.set(0.5, 0.5);
+    mainImg.width = (mainImg.width / mainImg.height) * 20;
+    mainImg.height = 20;
+    mainImg.x = 20;
+    mainImg.y = 18;
+    container.addChild(mainImg);
+
+    let iconImg1 = GetSprite(i2);
+    iconImg1.anchor.set(0.5, 0.5);
+    iconImg1.width = (iconImg1.width / iconImg1.height) * 22;
+    iconImg1.height = 22;
+    iconImg1.x = 20;
+    iconImg1.y = 57;
+    container.addChild(iconImg1);
+
+    let iconImg2 = GetSprite(i3);
+    iconImg2.anchor.set(0.5, 0.5);
+    iconImg2.width = (iconImg2.width / iconImg2.height) * 22;
+    iconImg2.height = 22;
+    iconImg2.x = 180;
+    iconImg2.y = 57;
+    container.addChild(iconImg2);
+
+    app.stage.addChild(container);
+    return container;
+};
+
 let folder;
 function setup() {
-    let logoBgCircle1 = createCircle(0xcf421f, 42, 373.5, 248.5, 0x1b823a, 0);
-    logoBgCircle1.alpha = 0.1;
-    let logoBgCircle2 = createCircle(0xcf421f, 34, 373.5, 248.5, 0x1b823a, 0);
-    logoBgCircle2.alpha = 0.1;
-    let logoBgCircle3 = createCircle(0xcf421f, 26, 373.5, 248.5, 0x1b823a, 0);
-    logoBgCircle3.alpha = 0.1;
+    let logoBgCircle1 = createCircle(0xfdf8f6, 45, 372.75, 248.25, 0x1b823a, 0);
+    let logoBgCircle2 = createCircle(0xfaedea, 40, 372.75, 248.25, 0x1b823a, 0);
+    let logoBgCircle3 = createCircle(0xf6dfdc, 34, 372.75, 248.25, 0x1b823a, 0);
 
     //Create the cat sprite
-    folder = new PIXI.Sprite(PIXI.Loader.shared.resources["images/logo.png"].texture);
+    folder = GetSprite("logo");
 
     //   folder.x = 30;
     //   folder.y = 30;
-    folder.position.set(373.5, 248.5);
+    folder.position.set(372.75, 248.25);
     //folder.scale.set(0.6, 0.6);
     folder.anchor.set(0.5, 0.5);
     folder.width = folder.height = 52;
@@ -156,29 +297,28 @@ function setup() {
     app.stage.addChild(folder);
 
     let lItemH = 58;
-    let leftItem1 = createIconTextGroupItem("Map fields", "images/logo.png");
+    let leftItem1 = createIconTextGroupItem("Map fields", "l_icon_1");
     leftItem1.position.set(15, 90);
     console.log(leftItem1.width);
 
-    let leftItem2 = createIconTextGroupItem("Track jobs", "images/logo.png");
+    let leftItem2 = createIconTextGroupItem("Track jobs", "l_icon_2");
     leftItem2.position.set(15, 90 + lItemH * 1);
 
-    let leftItem3 = createIconTextGroupItem("Take notes", "images/logo.png");
+    let leftItem3 = createIconTextGroupItem("Take notes", "l_icon_3");
     leftItem3.position.set(15, 90 + lItemH * 2);
 
-    let leftItem4 = createIconTextGroupItem("Log harvest", "images/logo.png");
+    let leftItem4 = createIconTextGroupItem("Log harvest", "l_icon_4");
     leftItem4.position.set(15, 90 + lItemH * 3);
 
-    let leftItem5 = createIconTextGroupItem("Invite team members", "images/logo.png");
+    let leftItem5 = createIconTextGroupItem("Invite team members", "l_icon_5");
     leftItem5.position.set(15, 90 + lItemH * 4);
 
-    let leftItem6 = createIconTextGroupItem("Submit hours worked", "images/logo.png");
+    let leftItem6 = createIconTextGroupItem("Submit hours worked", "l_icon_6");
     leftItem6.position.set(15, 400);
 
-    let leftItem7 = createIconTextGroupItem("Alerts", "images/logo.png");
-    leftItem7.position.set(55, 470);
+    let leftItem7 = createIconTextGroupItem("Alerts", "l_icon_7");
+    leftItem7.position.set(53, 470);
 
-    let color_lightGreen = 0xdcede3;
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 0);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 1);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 2);
@@ -186,10 +326,26 @@ function setup() {
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 3);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 4);
 
+    createCircle(color_lightOrange, 10, 159, 395 + lItemH / 2);
+    createCircle(color_lightOrange, 10, 316, 259);
+    createCircle(color_lightOrange, 10, 199, 465 + lItemH / 2);
+    createCircle(color_lightOrange, 10, 330, 289);
+
+    createCircle(color_lightGreen, 10, 430, 231);
+    createCircle(color_lightOrange, 10, 430, 259);
+
+    createCircle(color_lightGreen, 10, 575, 81);
+    createCircle(color_lightGreen, 10, 575, 81 + 53);
+    createCircle(color_lightGreen, 10, 575, 81 + 53 + 53);
+
+    createCircle(color_lightOrange, 10, 575, 259);
+    createCircle(color_lightOrange, 10, 575, 259 + 97);
+    createCircle(color_lightOrange, 10, 575, 259 + 97 + 97);
+
     let bgLineStyle = { width: 20, color: color_lightGreen, alpha: 1 };
-    let lineStyle = { width: 2.5, color: 0x1b823a, alpha: 1 };
-    let bgLineStyle2 = { width: 20, color: 0xeadcd8, alpha: 1 };
-    let lineStyle2 = { width: 2.5, color: 0xd0421f, alpha: 1 };
+    let lineStyle = { width: 2.5, color: color_darkGreen, alpha: 1 };
+    let bgLineStyle2 = { width: 20, color: color_lightOrange, alpha: 1 };
+    let lineStyle2 = { width: 2.5, color: color_darkOrange, alpha: 1 };
     let thinLineCurve = 20;
     let leftLineX1 = 90;
     let leftLineX2 = 160;
@@ -232,10 +388,10 @@ function setup() {
     ];
 
     let line7Path = [
-        { x: 0, y: 0 },
-        { x: 105, y: 0, curve: 10 },
+        { x: 132, y: -205 },
         { x: 105, y: -205, curve: 10 },
-        { x: 132, y: -205 }
+        { x: 105, y: 0, curve: 10 },
+        { x: 0, y: 0 }
     ];
 
     let rightLine1Path = [
@@ -269,8 +425,8 @@ function setup() {
     let rightLine6Path = [
         { x: 0, y: 0 },
         { x: 48, y: 0, curve: 10 },
-        { x: 48, y: 193, curve: 10 },
-        { x: 145, y: 193 }
+        { x: 48, y: 194, curve: 10 },
+        { x: 145, y: 194 }
     ];
 
     let bgLine1 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 0 }, line1Path);
@@ -289,6 +445,13 @@ function setup() {
     let line6 = drawLine(lineStyle2, { x: 159, y: 395 + lItemH / 2 }, line6Path);
     let line7 = drawLine(lineStyle2, { x: 199, y: 465 + lItemH / 2 }, line7Path);
 
+    let bgRLine1 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine1Path);
+    let bgRLine2 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine2Path);
+    let bgRLine3 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine3Path);
+    let bgRLine4 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine4Path);
+    let bgRLine5 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine5Path);
+    let bgRLine6 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine6Path);
+
     let rLine1 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine1Path);
     let rLine2 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine2Path);
     let rLine3 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine3Path);
@@ -296,11 +459,14 @@ function setup() {
     let rLine5 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine5Path);
     let rLine6 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine6Path);
 
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, 0x1b823a, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, 0x1b823a, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 2, 0x1b823a, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 3, 0x1b823a, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 4, 0x1b823a, 2.5);
+    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, color_darkGreen, 2.5);
+    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, color_darkGreen, 2.5);
+    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 2, color_darkGreen, 2.5);
+    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 3, color_darkGreen, 2.5);
+    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 4, color_darkGreen, 2.5);
+
+    createCircle(color_lightOrange, 3, 159, 395 + lItemH / 2, color_darkOrange, 2.5);
+    createCircle(color_lightOrange, 3, 330, 289, color_darkOrange, 2.5);
 
     const tri1 = createTriangle(159, 115);
     const tri2 = createTriangle(159, 115 + lItemH * 1);
@@ -308,8 +474,7 @@ function setup() {
     const tri4 = createTriangle(159, 115 + lItemH * 3);
     const tri5 = createTriangle(159, 115 + lItemH * 4);
     const tri6 = createTriangle(159, 395 + lItemH / 2, 0xd0421f);
-    const tri7 = createTriangle(325, 289, 0xd0421f);
-    tri7.scale.set(-1, 1);
+    const tri7 = createTriangle(325, 289, 0xd0421f, true);
 
     const rTri1 = createTriangle(430, 231);
     const rTri2 = createTriangle(430, 231);
@@ -318,6 +483,50 @@ function setup() {
     const rTri4 = createTriangle(430, 259, 0xd0421f);
     const rTri5 = createTriangle(430, 259, 0xd0421f);
     const rTri6 = createTriangle(430, 259, 0xd0421f);
+
+    // { x: 430, y: 231 }
+    // { x: 430, y: 231 }
+    // { x: 430, y: 231 }
+    // { x: 430, y: 259 }
+    // { x: 430, y: 259 }
+    // { x: 430, y: 259 }
+
+    let rTxt1 = createText("Fields overview", color_darkGreen, 595, 81);
+    let rTxt2 = createText("Jobs and Harvest review", color_darkGreen, 595, 81 + 53);
+    let rTxt3 = createText("Add product details for compliance", color_darkGreen, 595, 81 + 106);
+
+    let rBigBox1 = createBigBoxWithText(
+        "Reporting Module",
+        "Audit ready treatment reports",
+        "Autogenerated jobs and harvest logs",
+        "r_icon_1",
+        "r_icon_11",
+        "r_icon_11"
+    );
+    rBigBox1.x = 595;
+    rBigBox1.y = 220;
+
+    let rBigBox2 = createBigBoxWithText(
+        "Teams and Timesheets module",
+        "Team management",
+        "Timesheets",
+        "r_icon_2",
+        "r_icon_21",
+        "r_icon_21"
+    );
+    rBigBox2.x = 595;
+    rBigBox2.y = 315;
+
+    let rBigBox3 = createBigBoxWithText(
+        "Safe Spraying Module",
+        "Field access limitations",
+        "Label restriction alerts",
+        "r_icon_3",
+        "r_icon_31",
+        "r_icon_31"
+    );
+    rBigBox3.x = 595;
+    rBigBox3.y = 410;
 
     //app.ticker.add((delta) => gameLoop(delta));
 
@@ -348,7 +557,7 @@ function setup() {
     //     { pixi: { x: 220 }, yoyo: false, repeat: -1, duration: 2 }
     // );
 
-    let arrDuration1 = 1.5;
+    let arrDuration1 = 2;
     let arrDuration2 = arrDuration1 / 3;
 
     let l1PathPts = line1.path.split(" ").filter((p) => p !== "");
@@ -356,6 +565,13 @@ function setup() {
     let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
 
     gsap.timeline({ repeat: -1 })
+        .to(rTri1, { duration: 0, alpha: 0 })
+        .to(rTri2, { duration: 0, alpha: 0 })
+        .to(rTri3, { duration: 0, alpha: 0 })
+        .to(rTri4, { duration: 0, alpha: 0 })
+        .to(rTri5, { duration: 0, alpha: 0 })
+        .to(rTri6, { duration: 0, alpha: 0 })
+        .to(tri7, { duration: 0, alpha: 0 })
         .to(tri1, {
             duration: arrDuration1,
             ease: "none",
@@ -366,6 +582,7 @@ function setup() {
                 useRadians: true
             }
         })
+        .to(tri1, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri2,
             {
@@ -380,6 +597,7 @@ function setup() {
             },
             0
         )
+        .to(tri2, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri3,
             {
@@ -394,6 +612,7 @@ function setup() {
             },
             0
         )
+        .to(tri3, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri4,
             {
@@ -407,6 +626,7 @@ function setup() {
             },
             0
         )
+        .to(tri4, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri5,
             {
@@ -420,6 +640,28 @@ function setup() {
             },
             0
         )
+        .to(tri5, { duration: 0, alpha: 0 }, arrDuration1)
+        .to(
+            tri6,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: line6.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            0
+        )
+        .to(tri6, { duration: 0, alpha: 0 }, arrDuration1)
+        .to(rTri1, { delay: 0.25, duration: 0, alpha: 1 })
+        .to(rTri2, { duration: 0, alpha: 1 }, "<")
+        .to(rTri3, { duration: 0, alpha: 1 }, "<")
+        .to(rTri4, { duration: 0, alpha: 1 }, "<")
+        .to(rTri5, { duration: 0, alpha: 1 }, "<")
+        .to(rTri6, { duration: 0, alpha: 1 }, "<")
+        .to(tri7, { duration: 0, alpha: 1 }, "<")
         .to(
             rTri1,
             {
@@ -431,7 +673,7 @@ function setup() {
                     useRadians: true
                 }
             },
-            arrDuration1
+            "rightAnim"
         )
         .to(
             rTri2,
@@ -444,7 +686,7 @@ function setup() {
                     useRadians: true
                 }
             },
-            arrDuration1
+            "<"
         )
         .to(
             rTri3,
@@ -457,7 +699,7 @@ function setup() {
                     useRadians: true
                 }
             },
-            arrDuration1
+            "<"
         )
         .to(
             rTri4,
@@ -470,7 +712,7 @@ function setup() {
                     useRadians: true
                 }
             },
-            arrDuration1
+            "<"
         )
         .to(
             rTri5,
@@ -483,7 +725,7 @@ function setup() {
                     useRadians: true
                 }
             },
-            arrDuration1
+            "<"
         )
         .to(
             rTri6,
@@ -496,8 +738,28 @@ function setup() {
                     useRadians: true
                 }
             },
-            arrDuration1
-        );
+            "<"
+        )
+        .to(
+            tri7,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: line7.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    useRadians: true
+                }
+            },
+            "<"
+        )
+        .to(rTri1, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } })
+        .to(rTri2, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
+        .to(rTri3, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
+        .to(rTri4, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
+        .to(rTri5, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
+        .to(rTri6, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
+        .to(tri7, { duration: 0.5, alpha: 0 }, "<");
 
     // MotionPathHelper.create("#arrow", {
     //     path: path1
