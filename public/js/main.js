@@ -394,6 +394,8 @@ function setup() {
     let lineStyle = { width: 2.5, color: color_darkGreen, alpha: 1 };
     let bgLineStyle2 = { width: 20, color: color_lightOrange, alpha: 1 };
     let lineStyle2 = { width: 2.5, color: color_darkOrange, alpha: 1 };
+    let bgLineStyle3 = { width: 20, color: color_lightGray, alpha: 1 };
+    let lineStyle3 = { width: 2.5, color: color_darkGray, alpha: 1 };
     let thinLineCurve = 20;
     let leftLineX1 = 90;
     let leftLineX2 = 160;
@@ -496,26 +498,24 @@ function setup() {
     let bgRLine1 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine1Path);
     let bgRLine2 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine2Path);
     let bgRLine3 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine3Path);
-    let bgRLine4 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine4Path);
-    let bgRLine5 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine5Path);
-    let bgRLine6 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine6Path);
+    let bgRLine4 = drawLine(bgLineStyle3, { x: 430, y: 259 }, rightLine4Path);
+    let bgRLine5 = drawLine(bgLineStyle3, { x: 430, y: 259 }, rightLine5Path);
+    let bgRLine6 = drawLine(bgLineStyle3, { x: 430, y: 259 }, rightLine6Path);
+
+    let _bgRLine4 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine4Path);
+    let _bgRLine5 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine5Path);
+    let _bgRLine6 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine6Path);
 
     let rLine1 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine1Path);
     let rLine2 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine2Path);
     let rLine3 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine3Path);
-    let rLine4 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine4Path);
-    let rLine5 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine5Path);
-    let rLine6 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine6Path);
+    let rLine4 = drawLine(lineStyle3, { x: 430, y: 259 }, rightLine4Path);
+    let rLine5 = drawLine(lineStyle3, { x: 430, y: 259 }, rightLine5Path);
+    let rLine6 = drawLine(lineStyle3, { x: 430, y: 259 }, rightLine6Path);
 
-    let rContainer4 = new PIXI.Container();
-    rContainer4.addChild(bgRLine4.obj);
-    rContainer4.addChild(rLine4.obj);
-    app.stage.addChild(rContainer4);
-
-    let rContainer5 = new PIXI.Container();
-    rContainer5.addChild(bgRLine5.obj);
-    rContainer5.addChild(rLine5.obj);
-    app.stage.addChild(rContainer5);
+    let _rLine4 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine4Path);
+    let _rLine5 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine5Path);
+    let _rLine6 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine6Path);
 
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, color_darkGreen, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, color_darkGreen, 2.5);
@@ -714,18 +714,26 @@ function setup() {
             "<"
         );
         t1.to(
-            rContainer4,
+            [_rLine4.obj, _bgRLine4.obj],
             {
                 duration: 0.01,
-                pixi: { zIndex: activeState === 1 ? 1 : -1 }
+                pixi: { alpha: activeState === 1 ? 1 : 0 }
             },
             "<"
         );
         t1.to(
-            rContainer5,
+            [_rLine5.obj, _bgRLine5.obj],
             {
                 duration: 0.01,
-                pixi: { zIndex: activeState === 2 ? 1 : -1 }
+                pixi: { alpha: activeState === 2 ? 1 : 0 }
+            },
+            "<"
+        );
+        t1.to(
+            [_rLine6.obj, _bgRLine6.obj],
+            {
+                duration: 0.01,
+                pixi: { alpha: activeState === 3 ? 1 : 0 }
             },
             "<"
         );
@@ -831,11 +839,11 @@ function setup() {
             .to(tri6, { duration: 0, alpha: 0 })
             .to(rTri1, { delay: 0.25, duration: 0, alpha: 1 })
             .to(rTri2, { duration: 0, alpha: 1 }, "<")
-            .to(rTri3, { duration: 0, alpha: 1 }, "<")
-            .to(rTri4, { duration: 0, alpha: 1 }, "<")
-            .to(rTri5, { duration: 0, alpha: 1 }, "<")
-            .to(rTri6, { duration: 0, alpha: 1 }, "<")
-            .to(tri7, { duration: 0, alpha: 1 }, "<")
+            .to(rTri3, { duration: 0, alpha: 1 }, "<");
+        activeState === 1 && t1.to(rTri4, { duration: 0, alpha: 1 }, "<");
+        activeState === 2 && t1.to(rTri5, { duration: 0, alpha: 1 }, "<");
+        activeState === 3 && t1.to(rTri6, { duration: 0, alpha: 1 }, "<");
+        t1.to(tri7, { duration: 0, alpha: 1 }, "<")
             .to(
                 rTri1,
                 {
@@ -874,8 +882,9 @@ function setup() {
                     }
                 },
                 "<"
-            )
-            .to(
+            );
+        activeState === 1 &&
+            t1.to(
                 rTri4,
                 {
                     duration: arrDuration1,
@@ -887,8 +896,9 @@ function setup() {
                     }
                 },
                 "<"
-            )
-            .to(
+            );
+        activeState === 2 &&
+            t1.to(
                 rTri5,
                 {
                     duration: arrDuration1,
@@ -900,8 +910,9 @@ function setup() {
                     }
                 },
                 "<"
-            )
-            .to(
+            );
+        activeState === 3 &&
+            t1.to(
                 rTri6,
                 {
                     duration: arrDuration1,
@@ -913,20 +924,20 @@ function setup() {
                     }
                 },
                 "<"
-            )
-            .to(
-                tri7,
-                {
-                    duration: arrDuration1,
-                    ease: "none",
-                    motionPath: {
-                        autoRotate: 0,
-                        path: line7.path,
-                        useRadians: true
-                    }
-                },
-                "<"
-            )
+            );
+        t1.to(
+            tri7,
+            {
+                duration: arrDuration1,
+                ease: "none",
+                motionPath: {
+                    autoRotate: 0,
+                    path: line7.path,
+                    useRadians: true
+                }
+            },
+            "<"
+        )
             .to(rTri1, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } })
             .to(rTri2, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
             .to(rTri3, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
