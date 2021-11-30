@@ -18,6 +18,9 @@ let color_lightGreen = 0xf0f8f4;
 let color_darkGreen = 0x00843d;
 let color_darkOrange = 0xcf4520;
 let color_lightOrange = 0xfcf4f2;
+let color_lightGray = 0xf2f2f2;
+let color_darkGray = 0xd0d0d0;
+let animate = null;
 
 const app = new PIXI.Application({
     width: 960,
@@ -504,6 +507,16 @@ function setup() {
     let rLine5 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine5Path);
     let rLine6 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine6Path);
 
+    let rContainer4 = new PIXI.Container();
+    rContainer4.addChild(bgRLine4.obj);
+    rContainer4.addChild(rLine4.obj);
+    app.stage.addChild(rContainer4);
+
+    let rContainer5 = new PIXI.Container();
+    rContainer5.addChild(bgRLine5.obj);
+    rContainer5.addChild(rLine5.obj);
+    app.stage.addChild(rContainer5);
+
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, color_darkGreen, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, color_darkGreen, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 2, color_darkGreen, 2.5);
@@ -602,27 +615,138 @@ function setup() {
     //     { pixi: { x: 220 }, yoyo: false, repeat: -1, duration: 2 }
     // );
 
-    let arrDuration1 = 2;
-    let arrDuration2 = arrDuration1 / 3;
+    let state = -1;
 
-    let l1PathPts = line1.path.split(" ").filter((p) => p !== "");
-    let len = l1PathPts.length;
-    let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
+    let t1 = gsap.timeline({
+        repeat: 0,
+        onComplete: () => {
+            state++;
+            state %= 4;
+            t1.clear();
+            console.log("start again", state);
+            animate(state);
+        }
+    });
+    let animationInitialized = false;
 
-    gsap.timeline({ repeat: -1 })
-        .fromTo(
-            [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
-            { pixi: { alpha: 0, scale: 0.1 } },
-            { duration: 0.3, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 }
-        )
-        .to(rTri1, { duration: 0, alpha: 0 })
-        .to(rTri2, { duration: 0, alpha: 0 })
-        .to(rTri3, { duration: 0, alpha: 0 })
-        .to(rTri4, { duration: 0, alpha: 0 })
-        .to(rTri5, { duration: 0, alpha: 0 })
-        .to(rTri6, { duration: 0, alpha: 0 })
-        .to(tri7, { duration: 0, alpha: 0 })
-        .to(tri1, {
+    animate = (activeState) => {
+        let arrDuration1 = 2;
+        let arrDuration2 = arrDuration1 / 3;
+
+        let l1PathPts = line1.path.split(" ").filter((p) => p !== "");
+        let len = l1PathPts.length;
+        let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
+
+        t1.to(rLine4.obj, {
+            duration: 0.01,
+            pixi: { lineColor: activeState === 1 ? color_darkOrange : color_darkGray }
+        });
+        t1.to(
+            bgRLine4.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 1 ? color_lightOrange : color_lightGray }
+            },
+            "<"
+        );
+        t1.to(
+            rLine5.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 2 ? color_darkOrange : color_darkGray }
+            },
+            "<"
+        );
+        t1.to(
+            bgRLine5.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 2 ? color_lightOrange : color_lightGray }
+            },
+            "<"
+        );
+        t1.to(
+            rLine6.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 3 ? color_darkOrange : color_darkGray }
+            },
+            "<"
+        );
+        t1.to(
+            bgRLine6.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 3 ? color_lightOrange : color_lightGray }
+            },
+            "<"
+        );
+        t1.to(
+            line6.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 2 ? color_darkOrange : color_darkGray }
+            },
+            "<"
+        );
+        t1.to(
+            bgLine6.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 2 ? color_lightOrange : color_lightGray }
+            },
+            "<"
+        );
+        t1.to(
+            line7.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 3 ? color_darkOrange : color_darkGray }
+            },
+            "<"
+        );
+        t1.to(
+            bgLine7.obj,
+            {
+                duration: 0.01,
+                pixi: { lineColor: activeState === 3 ? color_lightOrange : color_lightGray }
+            },
+            "<"
+        );
+        t1.to(
+            rContainer4,
+            {
+                duration: 0.01,
+                pixi: { zIndex: activeState === 1 ? 1 : -1 }
+            },
+            "<"
+        );
+        t1.to(
+            rContainer5,
+            {
+                duration: 0.01,
+                pixi: { zIndex: activeState === 2 ? 1 : -1 }
+            },
+            "<"
+        );
+
+        t1.to(rTri1, { duration: 0, alpha: 0 });
+        t1.to(rTri2, { duration: 0, alpha: 0 });
+        t1.to(rTri3, { duration: 0, alpha: 0 });
+        t1.to(rTri4, { duration: 0, alpha: 0 });
+        t1.to(rTri5, { duration: 0, alpha: 0 });
+        t1.to(rTri6, { duration: 0, alpha: 0 });
+        t1.to(tri7, { duration: 0, alpha: 0 });
+
+        if (!animationInitialized) {
+            animationInitialized = true;
+            t1.fromTo(
+                [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
+                { pixi: { alpha: 0, scale: 0.1 } },
+                { duration: 0.3, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 }
+            );
+        }
+        t1.to(tri1, {
             duration: arrDuration1,
             ease: "none",
             //repeat: -1,
@@ -631,8 +755,8 @@ function setup() {
                 path: l1PathPts.join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
                 useRadians: true
             }
-        })
-        .to(
+        });
+        t1.to(
             tri2,
             {
                 duration: arrDuration1,
@@ -640,13 +764,13 @@ function setup() {
                 //repeat: -1,
                 motionPath: {
                     autoRotate: 0,
-                    path: line2.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    path: line2.path,
                     useRadians: true
                 }
             },
             "<"
-        )
-        .to(
+        );
+        t1.to(
             tri3,
             {
                 duration: arrDuration1,
@@ -654,162 +778,169 @@ function setup() {
                 //repeat: -1,
                 motionPath: {
                     autoRotate: 0,
-                    path: line3.path.split(" ").join(" "),
+                    path: line3.path,
                     useRadians: true
                 }
             },
             "<"
-        )
-        .to(
+        );
+        t1.to(
             tri4,
             {
                 duration: arrDuration1,
                 ease: "none",
                 motionPath: {
                     autoRotate: 0,
-                    path: line4.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    path: line4.path,
                     useRadians: true
                 }
             },
             "<"
-        )
-        .to(
+        );
+        t1.to(
             tri5,
             {
                 duration: arrDuration1,
                 ease: "none",
                 motionPath: {
                     autoRotate: 0,
-                    path: line5.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
+                    path: line5.path,
                     useRadians: true
                 }
             },
             "<"
         )
-        .to(
-            tri6,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: line6.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "<"
-        )
-        .to(tri1, { duration: 0, alpha: 0 })
-        .to(tri2, { duration: 0, alpha: 0 })
-        .to(tri3, { duration: 0, alpha: 0 })
-        .to(tri4, { duration: 0, alpha: 0 })
-        .to(tri5, { duration: 0, alpha: 0 })
-        .to(tri6, { duration: 0, alpha: 0 })
-        .to(rTri1, { delay: 0.25, duration: 0, alpha: 1 })
-        .to(rTri2, { duration: 0, alpha: 1 }, "<")
-        .to(rTri3, { duration: 0, alpha: 1 }, "<")
-        .to(rTri4, { duration: 0, alpha: 1 }, "<")
-        .to(rTri5, { duration: 0, alpha: 1 }, "<")
-        .to(rTri6, { duration: 0, alpha: 1 }, "<")
-        .to(tri7, { duration: 0, alpha: 1 }, "<")
-        .to(
-            rTri1,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: rLine1.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "rightAnim"
-        )
-        .to(
-            rTri2,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: rLine2.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "<"
-        )
-        .to(
-            rTri3,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: rLine3.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "<"
-        )
-        .to(
-            rTri4,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: rLine4.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "<"
-        )
-        .to(
-            rTri5,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: rLine5.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "<"
-        )
-        .to(
-            rTri6,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: rLine6.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "<"
-        )
-        .to(
-            tri7,
-            {
-                duration: arrDuration1,
-                ease: "none",
-                motionPath: {
-                    autoRotate: 0,
-                    path: line7.path.split(" ").join(" "), //"M159,115 h70 c20,0 20,0 20,20 v76 c0,20 0,20, 20,20",
-                    useRadians: true
-                }
-            },
-            "<"
-        )
-        .to(rTri1, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } })
-        .to(rTri2, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-        .to(rTri3, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-        .to(rTri4, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-        .to(rTri5, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-        .to(rTri6, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-        .to(tri7, { duration: 0.5, alpha: 1 }, "<");
+            .to(
+                tri6,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: line6.path,
+                        useRadians: true
+                    }
+                },
+                "<"
+            )
+            .to(tri1, { duration: 0, alpha: 0 })
+            .to(tri2, { duration: 0, alpha: 0 })
+            .to(tri3, { duration: 0, alpha: 0 })
+            .to(tri4, { duration: 0, alpha: 0 })
+            .to(tri5, { duration: 0, alpha: 0 })
+            .to(tri6, { duration: 0, alpha: 0 })
+            .to(rTri1, { delay: 0.25, duration: 0, alpha: 1 })
+            .to(rTri2, { duration: 0, alpha: 1 }, "<")
+            .to(rTri3, { duration: 0, alpha: 1 }, "<")
+            .to(rTri4, { duration: 0, alpha: 1 }, "<")
+            .to(rTri5, { duration: 0, alpha: 1 }, "<")
+            .to(rTri6, { duration: 0, alpha: 1 }, "<")
+            .to(tri7, { duration: 0, alpha: 1 }, "<")
+            .to(
+                rTri1,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: rLine1.path,
+                        useRadians: true
+                    }
+                },
+                "rightAnim"
+            )
+            .to(
+                rTri2,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: rLine2.path,
+                        useRadians: true
+                    }
+                },
+                "<"
+            )
+            .to(
+                rTri3,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: rLine3.path,
+                        useRadians: true
+                    }
+                },
+                "<"
+            )
+            .to(
+                rTri4,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: rLine4.path,
+                        useRadians: true
+                    }
+                },
+                "<"
+            )
+            .to(
+                rTri5,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: rLine5.path,
+                        useRadians: true
+                    }
+                },
+                "<"
+            )
+            .to(
+                rTri6,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: rLine6.path,
+                        useRadians: true
+                    }
+                },
+                "<"
+            )
+            .to(
+                tri7,
+                {
+                    duration: arrDuration1,
+                    ease: "none",
+                    motionPath: {
+                        autoRotate: 0,
+                        path: line7.path,
+                        useRadians: true
+                    }
+                },
+                "<"
+            )
+            .to(rTri1, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } })
+            .to(rTri2, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+            .to(rTri3, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+            .to(rTri4, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+            .to(rTri5, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+            .to(rTri6, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+            .to(tri7, { duration: 0.5, alpha: 1 }, "<")
+            .to(tri1, { duration: 0, alpha: 1 })
+            .to(tri2, { duration: 0, alpha: 1 })
+            .to(tri3, { duration: 0, alpha: 1 })
+            .to(tri4, { duration: 0, alpha: 1 })
+            .to(tri5, { duration: 0, alpha: 1 })
+            .to(tri6, { duration: 0, alpha: 1 });
+    };
 
     // MotionPathHelper.create("#arrow", {
     //     path: path1
