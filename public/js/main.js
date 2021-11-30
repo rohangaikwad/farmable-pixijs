@@ -27,31 +27,38 @@ const app = new PIXI.Application({
 });
 
 //Add the canvas that Pixi automatically created for you to the HTML document
-document.getElementById("cunt").appendChild(app.view);
+document.getElementById("animation-container").appendChild(app.view);
 //PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 let imageAliases = [
-    "logo.png",
-    "arrow.svg",
-    "l_icon_1.svg",
-    "l_icon_2.svg",
-    "l_icon_3.svg",
-    "l_icon_4.svg",
-    "l_icon_5.svg",
-    "l_icon_6.svg",
-    "l_icon_7.svg",
-    "r_icon_1.svg",
-    "r_icon_2.svg",
-    "r_icon_3.svg",
-    "r_icon_11.svg",
-    "r_icon_21.svg",
-    "r_icon_31.svg",
-    "logo_mobile_app.svg",
-    "logo_web_portal.svg"
+    "logo1.png",
+    "l_icon_1.png",
+    "l_icon_2.png",
+    "l_icon_3.png",
+    "l_icon_4.png",
+    "l_icon_5.png",
+    "l_icon_6.png",
+    "l_icon_7.png",
+    "r_icon_1.png",
+    "r_icon_2.png",
+    "r_icon_3.png",
+    "r_icon_11.png",
+    "r_icon_21.png",
+    "r_icon_31.png",
+    "logo_mobile_app.png",
+    "logo_web_portal.png"
 ];
 
 let images = imageAliases.map((i) => `images/${i}`);
-console.log(images);
-PIXI.Loader.shared.add(images).load(setup);
+
+WebFont.load({
+    custom: {
+        families: ["Raleway:n4,n5,n6,n7"]
+    },
+    active: function () {
+        console.log("fonts loaded");
+        PIXI.Loader.shared.add(images).load(setup);
+    }
+});
 
 //This `setup` function will run when the image has loaded
 
@@ -68,7 +75,7 @@ let createIconTextGroupItem = (textStr, textureName) => {
 
     const rectangle = new PIXI.Graphics();
     rectangle.lineStyle({ width: 2, color: 0xf1f1f1, alpha: 1 });
-    rectangle.beginFill(0xffffff);
+    //rectangle.beginFill(0xffffff);
     rectangle.drawRoundedRect(0, 0, containerW, containerH, 7);
     rectangle.endFill();
     container.addChild(rectangle);
@@ -81,15 +88,16 @@ let createIconTextGroupItem = (textStr, textureName) => {
     container.addChild(icon);
 
     const textLabel = new PIXI.Text(textStr, {
-        fontFamily: "Arial",
+        fontFamily: "Raleway",
         fontSize: 13,
+        fontWeight: 600,
         fill: "#000000",
         wordWrap: true,
         wordWrapWidth: 90,
         align: "left"
     });
     textLabel.anchor.set(0, 0.5);
-    textLabel.position.set(icon.x + icon.width / 2 + 5, containerH / 2);
+    textLabel.position.set(37, containerH / 2);
     container.addChild(textLabel);
 
     app.stage.addChild(container);
@@ -98,9 +106,9 @@ let createIconTextGroupItem = (textStr, textureName) => {
 
 let createText = (textStr, txtColor, x, y) => {
     const textLabel = new PIXI.Text(textStr, {
-        fontFamily: "Arial",
-        fontSize: 16,
-        fontWeight: 600,
+        fontFamily: "Raleway",
+        fontSize: 16.4,
+        fontWeight: 500,
         fill: txtColor,
         wordWrap: true,
         wordWrapWidth: 360,
@@ -204,9 +212,9 @@ let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
     container.addChild(boxLine1.obj);
 
     const mainText = new PIXI.Text(t1, {
-        fontFamily: "Arial",
-        fontSize: 16,
-        fontWeight: 500,
+        fontFamily: "Raleway",
+        fontSize: 15.7,
+        fontWeight: 600,
         fill: color_darkOrange,
         wordWrap: true,
         wordWrapWidth: 360,
@@ -218,12 +226,12 @@ let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
     container.addChild(mainText);
 
     const txt1 = new PIXI.Text(t2, {
-        fontFamily: "Arial",
-        fontSize: 14,
+        fontFamily: "Raleway",
+        fontSize: 13.4,
         fontWeight: 500,
         fill: color_darkOrange,
         wordWrap: true,
-        wordWrapWidth: 110,
+        wordWrapWidth: 115,
         align: "left"
     });
     txt1.anchor.set(0, 0.5);
@@ -232,8 +240,8 @@ let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
     container.addChild(txt1);
 
     const txt2 = new PIXI.Text(t3, {
-        fontFamily: "Arial",
-        fontSize: 14,
+        fontFamily: "Raleway",
+        fontSize: 13.5,
         fontWeight: 500,
         fill: color_darkOrange,
         wordWrap: true,
@@ -273,32 +281,69 @@ let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
     return container;
 };
 
-let folder;
+let staticLogoText = function () {
+    let logoMob = GetSprite("logo_mobile_app");
+    logoMob.anchor.set(1, 0.5);
+    logoMob.position.set(40, 27);
+    logoMob.width = (logoMob.width / logoMob.height) * 31;
+    logoMob.height = 31;
+    app.stage.addChild(logoMob);
+    createText("Mobile App", 0x000000, 50, 27);
+
+    let logoWeb = GetSprite("logo_web_portal");
+    logoWeb.anchor.set(1, 0.5);
+    logoWeb.position.set(629, 27);
+    logoWeb.width = (logoWeb.width / logoWeb.height) * 31;
+    logoWeb.height = 31;
+    app.stage.addChild(logoWeb);
+    createText("Web Portal", 0x000000, 629 + 10, 27);
+
+    createCircle(color_darkGreen, 8.5, 723, 575);
+    const text_free = new PIXI.Text("Free", {
+        fontFamily: "Raleway",
+        fontSize: 13.7,
+        fontWeight: 500,
+        fill: color_darkGreen,
+        wordWrap: true,
+        wordWrapWidth: 360,
+        align: "left"
+    });
+    text_free.anchor.set(0, 0.5);
+    text_free.position.set(737, 575);
+    app.stage.addChild(text_free);
+
+    createCircle(color_darkOrange, 8.5, 801, 575);
+    const text_paid = new PIXI.Text("Paid add-on modules", {
+        fontFamily: "Raleway",
+        fontSize: 13.7,
+        fontWeight: 500,
+        fill: color_darkOrange,
+        wordWrap: true,
+        wordWrapWidth: 360,
+        align: "left"
+    });
+    text_paid.anchor.set(0, 0.5);
+    text_paid.position.set(815, 575);
+    app.stage.addChild(text_paid);
+};
+
 function setup() {
+    staticLogoText();
+
     let logoBgCircle1 = createCircle(0xfdf8f6, 45, 372.75, 248.25, 0x1b823a, 0);
-    let logoBgCircle2 = createCircle(0xfaedea, 40, 372.75, 248.25, 0x1b823a, 0);
-    let logoBgCircle3 = createCircle(0xf6dfdc, 34, 372.75, 248.25, 0x1b823a, 0);
+    let logoBgCircle2 = createCircle(0xfaedea, 38, 372.75, 248.25, 0x1b823a, 0);
+    let logoBgCircle3 = createCircle(0xf6dfdc, 32, 372.75, 248.25, 0x1b823a, 0);
 
-    //Create the cat sprite
-    folder = GetSprite("logo");
-
-    //   folder.x = 30;
-    //   folder.y = 30;
-    folder.position.set(372.75, 248.25);
-    //folder.scale.set(0.6, 0.6);
-    folder.anchor.set(0.5, 0.5);
-    folder.width = folder.height = 52;
-    //folder.height = 40;
-    //folder.angle = 270;
-    // folder.vx = 0;
-    // folder.vy = 0;
-
-    //Add the cat to the stage
-    app.stage.addChild(folder);
+    let mainLogo = GetSprite("logo1");
+    mainLogo.position.set(372.75, 248.25);
+    mainLogo.anchor.set(0.5, 0.5);
+    mainLogo.width = mainLogo.height = 52;
+    app.stage.addChild(mainLogo);
 
     let lItemH = 58;
     let leftItem1 = createIconTextGroupItem("Map fields", "l_icon_1");
     leftItem1.position.set(15, 90);
+    //leftItem1.pivot.x = leftItem1.position.x + leftItem1.width / 2;
     console.log(leftItem1.width);
 
     let leftItem2 = createIconTextGroupItem("Track jobs", "l_icon_2");
@@ -530,26 +575,26 @@ function setup() {
 
     //app.ticker.add((delta) => gameLoop(delta));
 
-    // gsap.to(logoBgCircle1, {
-    //     pixi: { scale: 1.15 },
-    //     duration: 0.5,
-    //     yoyo: true,
-    //     delay: 0.1,
-    //     repeat: -1
-    // });
-    // gsap.to(logoBgCircle2, {
-    //     pixi: { scale: 1.2 },
-    //     duration: 0.5,
-    //     yoyo: true,
-    //     delay: 0.05,
-    //     repeat: -1
-    // });
-    // gsap.to(logoBgCircle3, {
-    //     pixi: { scale: 1.25 },
-    //     duration: 0.5,
-    //     yoyo: true,
-    //     repeat: -1
-    // });
+    gsap.to(logoBgCircle1, {
+        pixi: { alpha: 0.2 },
+        duration: 1,
+        yoyo: true,
+        repeat: -1
+    });
+    gsap.to(logoBgCircle2, {
+        pixi: { alpha: 0.2 },
+        duration: 1,
+        yoyo: true,
+        delay: 0.1,
+        repeat: -1
+    });
+    gsap.to(logoBgCircle3, {
+        pixi: { alpha: 0.2 },
+        duration: 1,
+        delay: 0.3,
+        yoyo: true,
+        repeat: -1
+    });
 
     // gsap.fromTo(
     //     tri1,
@@ -565,6 +610,11 @@ function setup() {
     let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
 
     gsap.timeline({ repeat: -1 })
+        .fromTo(
+            [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
+            { pixi: { alpha: 0, scale: 0.1 } },
+            { duration: 0.3, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 }
+        )
         .to(rTri1, { duration: 0, alpha: 0 })
         .to(rTri2, { duration: 0, alpha: 0 })
         .to(rTri3, { duration: 0, alpha: 0 })
@@ -582,7 +632,6 @@ function setup() {
                 useRadians: true
             }
         })
-        .to(tri1, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri2,
             {
@@ -595,9 +644,8 @@ function setup() {
                     useRadians: true
                 }
             },
-            0
+            "<"
         )
-        .to(tri2, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri3,
             {
@@ -610,9 +658,8 @@ function setup() {
                     useRadians: true
                 }
             },
-            0
+            "<"
         )
-        .to(tri3, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri4,
             {
@@ -624,9 +671,8 @@ function setup() {
                     useRadians: true
                 }
             },
-            0
+            "<"
         )
-        .to(tri4, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri5,
             {
@@ -638,9 +684,8 @@ function setup() {
                     useRadians: true
                 }
             },
-            0
+            "<"
         )
-        .to(tri5, { duration: 0, alpha: 0 }, arrDuration1)
         .to(
             tri6,
             {
@@ -652,9 +697,14 @@ function setup() {
                     useRadians: true
                 }
             },
-            0
+            "<"
         )
-        .to(tri6, { duration: 0, alpha: 0 }, arrDuration1)
+        .to(tri1, { duration: 0, alpha: 0 })
+        .to(tri2, { duration: 0, alpha: 0 })
+        .to(tri3, { duration: 0, alpha: 0 })
+        .to(tri4, { duration: 0, alpha: 0 })
+        .to(tri5, { duration: 0, alpha: 0 })
+        .to(tri6, { duration: 0, alpha: 0 })
         .to(rTri1, { delay: 0.25, duration: 0, alpha: 1 })
         .to(rTri2, { duration: 0, alpha: 1 }, "<")
         .to(rTri3, { duration: 0, alpha: 1 }, "<")
@@ -753,13 +803,13 @@ function setup() {
             },
             "<"
         )
-        .to(rTri1, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } })
-        .to(rTri2, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
-        .to(rTri3, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
-        .to(rTri4, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
-        .to(rTri5, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
-        .to(rTri6, { duration: 0.5, alpha: 0, pixi: { scale: 1.45 } }, "<")
-        .to(tri7, { duration: 0.5, alpha: 0 }, "<");
+        .to(rTri1, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } })
+        .to(rTri2, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+        .to(rTri3, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+        .to(rTri4, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+        .to(rTri5, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+        .to(rTri6, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+        .to(tri7, { duration: 0.5, alpha: 1 }, "<");
 
     // MotionPathHelper.create("#arrow", {
     //     path: path1
