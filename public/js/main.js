@@ -22,6 +22,8 @@ let color_lightGray = 0xf2f2f2;
 let color_darkGray = 0xd0d0d0;
 let animate = null;
 
+let animStateIndex = 0;
+
 const app = new PIXI.Application({
     width: 960,
     height: 602,
@@ -624,7 +626,9 @@ function setup() {
             state %= 4;
             t1.clear();
             console.log("start again", state);
-            animate(state);
+            setTimeout(() => {
+                animate(state);
+            }, 600);
         }
     });
     let animationInitialized = false;
@@ -938,12 +942,12 @@ function setup() {
             },
             "<"
         )
-            .to(rTri1, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } })
-            .to(rTri2, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-            .to(rTri3, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-            .to(rTri4, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-            .to(rTri5, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
-            .to(rTri6, { duration: 0.5, alpha: 1, pixi: { scale: 1.45 } }, "<")
+            .to(rTri1, { duration: 0.5, alpha: 1, pixi: { scale: 1 } })
+            .to(rTri2, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
+            .to(rTri3, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
+            .to(rTri4, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
+            .to(rTri5, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
+            .to(rTri6, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
             .to(tri7, { duration: 0.5, alpha: 1 }, "<")
             .to(tri1, { duration: 0, alpha: 1 })
             .to(tri2, { duration: 0, alpha: 1 })
