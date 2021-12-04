@@ -1,0 +1,57 @@
+* {
+    box-sizing: border-box;
+}
+@import "fonts";
+
+body { margin: 0; background: linear-gradient(0deg, #FAFAFA, #FAFAFA); font-family: 'Raleway', sans-serif;}
+
+.bg {
+    margin: 0 auto; text-align: center;
+    //height: 150vh;
+}
+
+
+.container {
+    max-width: 100%; width: 1366px; margin: 0 auto;
+}
+section.heading {
+    text-align: center;
+    h1 { font-size: 40px; font-weight: 700; }
+}
+section.animations {
+    display: flex; align-items: center;
+    @media (max-width: 1024px) { flex-direction: column; }
+}
+.stages {
+    flex: 1 1 100%; max-width: 300px; margin-right: 40px;
+
+    ul {
+        padding-left: 0; list-style: none;
+        li {
+            width: 100%; height: 72px; margin-bottom: 1px; border: 1px solid #F0F0F0; background: #ffffff; display: flex; justify-content: center; align-items: center; transition: 0.3s; cursor: pointer; border-radius: 12px 0 0 12px; font-weight: 700; color: #979797; user-select: none;
+            &.active{
+                background: #FFD300; color: #121212;
+            }
+            &:hover {
+                color: #121212;
+            }
+        }
+    }
+}
+
+#animation-helper {
+    flex: 1; min-width: 720px;
+    @media (max-width: 1024px) { min-width: 100%; }
+}
+
+#animation-container {
+    width: 100%; padding-bottom: 62.708333333%; display: block; position: relative;
+
+    img { position: absolute; top: 0; left: 0; opacity: 0; width: 100%; }
+
+    canvas {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    }
+
+    .animCont { position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+}
