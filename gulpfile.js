@@ -62,5 +62,25 @@ function bundle() {
 }
 
 exports.bundle = bundle;
+function bundleAll() {
+    let files = [
+        "webfont.js",
+        "gsap.js",
+        "PixiPlugin.js",
+        "MotionPathPlugin.js",
+        //"MotionPathHelper.min.js",
+        "pixi.js"
+        //"pixi.dashed-line.js"
+    ];
+    let allFiles = [...files.map((f) => `public/js/third-party/${f}`), "public/js/main.js"];
+    return src(allFiles)
+        .pipe(concat("bundle.js"))
+        .pipe(dest("./public/js/"))
+        .pipe(terser())
+        .pipe(rename("bundle.min.js"))
+        .pipe(dest("./public/js/"));
+}
+
+exports.bundleAll = bundleAll;
 // Default Gulp task
 exports.default = series(scssTask, browsersyncServe, watchTask);
