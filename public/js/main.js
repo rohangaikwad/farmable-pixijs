@@ -445,10 +445,10 @@ function setupAnimations() {
     gsap.fromTo(
         mainLogo,
         {
-            pixi: { width: 30, height: 30, alpha: 0, rotate: 90, rotation: 90 }
+            pixi: { width: 30, height: 30, alpha: 0, rotation: 90 }
         },
         {
-            pixi: { width: 52, height: 52, alpha: 1, rotate: 0, rotation: 0 },
+            pixi: { width: 52, height: 52, alpha: 1, rotation: 0 },
             duration: 1
         }
     );
@@ -459,21 +459,27 @@ function setupAnimations() {
     let lItemH = 58;
     let leftItem1 = createIconTextGroupItem("Map fields", "l_icon_1");
     leftItem1.position.set(15, 90);
+    if (!isDebugMode) leftItem1.alpha = 0;
 
     let leftItem2 = createIconTextGroupItem("Track jobs", "l_icon_2");
     leftItem2.position.set(15, 90 + lItemH * 1);
+    if (!isDebugMode) leftItem2.alpha = 0;
 
     let leftItem3 = createIconTextGroupItem("Take notes", "l_icon_3");
     leftItem3.position.set(15, 90 + lItemH * 2);
+    if (!isDebugMode) leftItem3.alpha = 0;
 
     let leftItem4 = createIconTextGroupItem("Log harvest", "l_icon_4");
     leftItem4.position.set(15, 90 + lItemH * 3);
+    if (!isDebugMode) leftItem4.alpha = 0;
 
     let leftItem5 = createIconTextGroupItem("Invite team members", "l_icon_5");
     leftItem5.position.set(15, 90 + lItemH * 4);
+    if (!isDebugMode) leftItem5.alpha = 0;
 
     let leftItem6 = createIconTextGroupItem("Submit hours worked", "l_icon_6");
     leftItem6.position.set(15, 400);
+    if (!isDebugMode) leftItem6.alpha = 0;
     let leftItem6Sprite = leftItem6.children[1];
     let leftItem6Text = leftItem6.children[2];
     leftItem6Text.style.fill = color_darkGray;
@@ -481,6 +487,7 @@ function setupAnimations() {
 
     let leftItem7 = createIconTextGroupItem("Alerts", "l_icon_7");
     leftItem7.position.set(53, 470);
+    if (!isDebugMode) leftItem7.alpha = 0;
     let leftItem7Sprite = leftItem7.children[1];
     let leftItem7Text = leftItem7.children[2];
     leftItem7Text.style.fill = color_darkGray;
@@ -606,16 +613,23 @@ function setupAnimations() {
     let bgLine3 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 2 }, line3Path);
     let bgLine4 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 3 }, line4Path);
     let bgLine5 = drawLine(bgLineStyle, { x: 159, y: 115 + lItemH * 4 }, line5Path);
-    let bgLine6 = drawLine(bgLineStyle2, { x: 159, y: 395 + lItemH / 2 }, line6Path);
-    let bgLine7 = drawLine(bgLineStyle2, { x: 199, y: 465 + lItemH / 2 }, line7Path);
+    let bgLine6 = drawLine(bgLineStyle3, { x: 159, y: 395 + lItemH / 2 }, line6Path);
+    let bgLine7 = drawLine(bgLineStyle3, { x: 199, y: 465 + lItemH / 2 }, line7Path);
 
     let line1 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 0 }, line1Path);
+    if (!isDebugMode) line1.obj.alpha = 0;
     let line2 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 1 }, line2Path);
+    if (!isDebugMode) line2.obj.alpha = 0;
     let line3 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 2 }, line3Path);
+    if (!isDebugMode) line3.obj.alpha = 0;
     let line4 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 3 }, line4Path);
+    if (!isDebugMode) line4.obj.alpha = 0;
     let line5 = drawLine(lineStyle, { x: 159, y: 115 + lItemH * 4 }, line5Path);
-    let line6 = drawLine(lineStyle2, { x: 159, y: 395 + lItemH / 2 }, line6Path);
-    let line7 = drawLine(lineStyle2, { x: 199, y: 465 + lItemH / 2 }, line7Path);
+    if (!isDebugMode) line5.obj.alpha = 0;
+    let line6 = drawLine(lineStyle3, { x: 159, y: 395 + lItemH / 2 }, line6Path);
+    if (!isDebugMode) line6.obj.alpha = 0;
+    let line7 = drawLine(lineStyle3, { x: 199, y: 465 + lItemH / 2 }, line7Path);
+    if (!isDebugMode) line7.obj.alpha = 0;
 
     let bgRLine1 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine1Path);
     let bgRLine2 = drawLine(bgLineStyle, { x: 430, y: 231 }, rightLine2Path);
@@ -625,19 +639,31 @@ function setupAnimations() {
     let bgRLine6 = drawLine(bgLineStyle3, { x: 430, y: 259 }, rightLine6Path);
 
     let _bgRLine4 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine4Path); // for layering at the time of animation
+    if (!isDebugMode) _bgRLine4.obj.alpha = 0;
     let _bgRLine5 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine5Path);
+    if (!isDebugMode) _bgRLine5.obj.alpha = 0;
     let _bgRLine6 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine6Path);
+    if (!isDebugMode) _bgRLine6.obj.alpha = 0;
 
     let rLine1 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine1Path);
+    if (!isDebugMode) rLine1.obj.alpha = 0;
     let rLine2 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine2Path);
+    if (!isDebugMode) rLine2.obj.alpha = 0;
     let rLine3 = drawLine(lineStyle, { x: 430, y: 231 }, rightLine3Path);
+    if (!isDebugMode) rLine3.obj.alpha = 0;
     let rLine4 = drawLine(lineStyle3, { x: 430, y: 259 }, rightLine4Path);
+    if (!isDebugMode) rLine4.obj.alpha = 0;
     let rLine5 = drawLine(lineStyle3, { x: 430, y: 259 }, rightLine5Path);
+    if (!isDebugMode) rLine5.obj.alpha = 0;
     let rLine6 = drawLine(lineStyle3, { x: 430, y: 259 }, rightLine6Path);
+    if (!isDebugMode) rLine6.obj.alpha = 0;
 
     let _rLine4 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine4Path);
+    if (!isDebugMode) _rLine4.obj.alpha = 0;
     let _rLine5 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine5Path);
+    if (!isDebugMode) _rLine5.obj.alpha = 0;
     let _rLine6 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine6Path);
+    if (!isDebugMode) _rLine6.obj.alpha = 0;
 
     let dashOptions = [
         4, // space
@@ -698,14 +724,21 @@ function setupAnimations() {
         y: 465 + lItemH / 2
     });
 
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, color_darkGreen, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, color_darkGreen, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 2, color_darkGreen, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 3, color_darkGreen, 2.5);
-    createCircle(color_lightGreen, 3, 159, 115 + lItemH * 4, color_darkGreen, 2.5);
+    let lCircle1 = createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, color_darkGreen, 2.5);
+    if (!isDebugMode) lCircle1.alpha = 0;
+    let lCircle2 = createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, color_darkGreen, 2.5);
+    if (!isDebugMode) lCircle2.alpha = 0;
+    let lCircle3 = createCircle(color_lightGreen, 3, 159, 115 + lItemH * 2, color_darkGreen, 2.5);
+    if (!isDebugMode) lCircle3.alpha = 0;
+    let lCircle4 = createCircle(color_lightGreen, 3, 159, 115 + lItemH * 3, color_darkGreen, 2.5);
+    if (!isDebugMode) lCircle4.alpha = 0;
+    let lCircle5 = createCircle(color_lightGreen, 3, 159, 115 + lItemH * 4, color_darkGreen, 2.5);
+    if (!isDebugMode) lCircle5.alpha = 0;
 
     let lCircle6 = createCircle(color_lightOrange, 3, 159, 395 + lItemH / 2, color_darkGray, 2.5);
+    if (!isDebugMode) lCircle6.alpha = 0;
     let lCircle7 = createCircle(color_lightOrange, 3, 330, 289, color_darkGray, 2.5);
+    if (!isDebugMode) lCircle7.alpha = 0;
 
     const tri1 = createTriangle(159, 115);
     const tri2 = createTriangle(159, 115 + lItemH * 1);
@@ -802,22 +835,44 @@ function setupAnimations() {
         repeat: -1
     });
 
-    t1 = gsap.timeline({
-        repeat: 0,
-        onComplete: () => {
-            //animStateIndex++;
-            animStateIndex %= 4;
-            t1.clear();
-            console.log("start again", animStateIndex);
-            setTimeout(
-                () => {
-                    animate(animStateIndex);
-                },
-                animationInitialized ? 600 : 0
-            );
-        }
-    });
+    let options = {
+        root: document.querySelector("#animtion-container"),
+        rootMargin: "0px",
+        threshold: 0.75
+    };
+
     let animationInitialized = false;
+    let initiatedFromObserver = false;
+
+    let observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+            console.log("intersectionRatio", entry.intersectionRatio);
+            if (entry.intersectionRatio > 0.5 && !initiatedFromObserver) {
+                initiatedFromObserver = true;
+
+                t1 = gsap.timeline({
+                    repeat: 0,
+                    onComplete: () => {
+                        //animStateIndex++;
+                        animStateIndex %= 4;
+                        t1.clear();
+                        console.log("start again", animStateIndex);
+                        setTimeout(
+                            () => {
+                                animate(animStateIndex);
+                            },
+                            animationInitialized ? 600 : 0
+                        );
+                    }
+                });
+            }
+        });
+    }, options);
+    let target = document.querySelector("#animation-container canvas");
+
+    setTimeout(() => {
+        observer.observe(target);
+    }, 1000);
 
     animate = (activeState) => {
         let arrDuration1 = 2;
@@ -828,6 +883,102 @@ function setupAnimations() {
         let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
 
         let rightSideAnimDelay = 0.25;
+
+        if (!animationInitialized) {
+            animationInitialized = true;
+            t1.fromTo(
+                [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
+                { pixi: { alpha: 0, scale: 0.1 } },
+                { duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
+                "stagger"
+            );
+            t1.fromTo(
+                [rTxt1, rTxt2, rTxt3, rBigBox1, rBigBox2, rBigBox3],
+                { pixi: { alpha: 0, scale: 0.1 } },
+                { duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
+                "stagger"
+            );
+            t1.fromTo(
+                [
+                    line1.obj,
+                    line2.obj,
+                    line3.obj,
+                    line4.obj,
+                    line5.obj,
+                    line6.obj,
+                    line7.obj,
+                    rLine1.obj,
+                    rLine2.obj,
+                    rLine3.obj,
+                    rLine4.obj,
+                    rLine5.obj,
+                    rLine6.obj
+                ],
+                { pixi: { alpha: 0 } },
+                { duration: 0.5, pixi: { alpha: 1 }, stagger: 0.05 }
+            );
+
+            t1.to(
+                [lCircle1, lCircle2, lCircle3, lCircle4, lCircle5, lCircle6, lCircle7],
+                {
+                    duration: 0.5,
+                    pixi: { alpha: 1 },
+                    stagger: 0.05
+                },
+                "<"
+            );
+            t1.to(leftItem1, { duration: 0.1 });
+        } else {
+            t1.to(
+                [
+                    leftItem1,
+                    leftItem2,
+                    leftItem3,
+                    leftItem4,
+                    leftItem5,
+                    leftItem6,
+                    leftItem7,
+                    rTxt1,
+                    rTxt2,
+                    rTxt3,
+                    rBigBox1,
+                    rBigBox2,
+                    rBigBox3
+                ],
+                {
+                    duration: 0,
+                    pixi: { alpha: 1, scale: 1 }
+                }
+            );
+            t1.to(
+                [
+                    lCircle1,
+                    lCircle2,
+                    lCircle3,
+                    lCircle4,
+                    lCircle5,
+                    lCircle6,
+                    lCircle7,
+                    line1.obj,
+                    line2.obj,
+                    line3.obj,
+                    line4.obj,
+                    line5.obj,
+                    line6.obj,
+                    line7.obj,
+                    rLine1.obj,
+                    rLine2.obj,
+                    rLine3.obj,
+                    rLine4.obj,
+                    rLine5.obj,
+                    rLine6.obj
+                ],
+                {
+                    duration: 0,
+                    pixi: { alpha: 1 }
+                }
+            );
+        }
 
         t1.to(rBigBox1Lines, {
             duration: 0,
@@ -1026,23 +1177,6 @@ function setupAnimations() {
         t1.to(rTri5, { duration: 0, alpha: 0 });
         t1.to(rTri6, { duration: 0, alpha: 0 });
         t1.to(tri7, { duration: 0, alpha: 0 });
-
-        if (!animationInitialized) {
-            animationInitialized = true;
-            t1.fromTo(
-                [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
-                { pixi: { alpha: 0, scale: 0.1 } },
-                { delay: 1, duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
-                "stagger"
-            );
-            t1.fromTo(
-                [rTxt1, rTxt2, rTxt3, rBigBox1, rBigBox2, rBigBox3],
-                { pixi: { alpha: 0, scale: 0.1 } },
-                { delay: 1, duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
-                "stagger"
-            );
-            t1.to(leftItem1, { duration: 0.3 });
-        }
 
         t1.to(tri1, { duration: 0, alpha: 1 });
         t1.to(tri2, { duration: 0, alpha: 1 });
