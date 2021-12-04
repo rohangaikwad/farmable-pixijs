@@ -1,18 +1,14 @@
 gsap.registerPlugin(PixiPlugin);
 gsap.registerPlugin(MotionPathPlugin);
 
-let type = "WebGL";
-if (!PIXI.utils.isWebGLSupported()) {
-    type = "canvas";
-}
-//PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+// let type = "WebGL";
+// if (!PIXI.utils.isWebGLSupported()) {
+//     type = "canvas";
+// }
+
 let dpr = window.devicePixelRatio;
 let resolution = dpr < 2 ? 2 : dpr;
 PIXI.settings.RESOLUTION = PIXI.settings.FILTER_RESOLUTION = resolution;
-//console.log(type);
-
-const cw = 960;
-const ch = 602;
 
 let color_lightGreen = 0xf0f8f4;
 let color_darkGreen = 0x00843d;
@@ -53,8 +49,8 @@ let imageAliases = [
     "logo_mobile_app.png",
     "logo_web_portal.png"
 ];
-
-let images = imageAliases.map((i) => `images/${i}`);
+let imagesFolderPath = "images";
+let images = imageAliases.map((i) => `${imagesFolderPath}/${i}`);
 
 WebFont.load({
     custom: {
@@ -62,7 +58,7 @@ WebFont.load({
     },
     active: function () {
         // console.log("fonts loaded");
-        PIXI.Loader.shared.add(images).load(setup);
+        PIXI.Loader.shared.add(images).load(setupAnimations);
     }
 });
 
@@ -205,7 +201,7 @@ let drawLine = (style, pos, points, fill = false) => {
 
 let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
     let container = new PIXI.Container();
-    let lineStyle3 = { width: 1, color: color_darkOrange, alpha: 1 };
+    let lineStyle3 = { width: 1, color: color_darkGray, alpha: 1 };
     let boxOutline = drawLine(
         lineStyle3,
         { x: 0, y: 0 },
@@ -296,7 +292,7 @@ let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
     return container;
 };
 
-let staticLogoText = function () {
+let setupStaticLogoText = function () {
     let logoMob = GetSprite("logo_mobile_app");
     logoMob.anchor.set(1, 0.5);
     logoMob.position.set(40, 27);
@@ -432,8 +428,9 @@ let drawDashedLine = (points, lineStyle, dashOptions, pos) => {
     return line;
 };
 
-function setup() {
-    staticLogoText();
+function setupAnimations() {
+    let isDebugMode = false;
+    setupStaticLogoText();
 
     let logoBgCircle1 = createCircle(0xfdf8f6, 45, 372.75, 248.25, 0x1b823a, 0);
     let logoBgCircle2 = createCircle(0xfaedea, 38, 372.75, 248.25, 0x1b823a, 0);
@@ -444,6 +441,17 @@ function setup() {
     mainLogo.anchor.set(0.5, 0.5);
     mainLogo.width = mainLogo.height = 52;
     app.stage.addChild(mainLogo);
+
+    gsap.fromTo(
+        mainLogo,
+        {
+            pixi: { width: 30, height: 30, alpha: 0, rotate: 90, rotation: 90 }
+        },
+        {
+            pixi: { width: 52, height: 52, alpha: 1, rotate: 0, rotation: 0 },
+            duration: 1
+        }
+    );
 
     let colorMatrix = new PIXI.filters.ColorMatrixFilter();
     colorMatrix.greyscale(0.7, true);
@@ -716,8 +724,11 @@ function setup() {
     const rTri6 = createTriangle(430, 259, 0xd0421f);
 
     let rTxt1 = createText("Fields overview", color_darkGreen, 595, 81);
+    if (!isDebugMode) rTxt1.alpha = 0;
     let rTxt2 = createText("Jobs and Harvest review", color_darkGreen, 595, 81 + 53);
+    if (!isDebugMode) rTxt2.alpha = 0;
     let rTxt3 = createText("Add product details for compliance", color_darkGreen, 595, 81 + 106);
+    if (!isDebugMode) rTxt3.alpha = 0;
 
     let rBigBox1 = createBigBoxWithText(
         "Reporting Module",
@@ -729,6 +740,7 @@ function setup() {
     );
     rBigBox1.x = 595;
     rBigBox1.y = 220;
+    if (!isDebugMode) rBigBox1.alpha = 0;
     let rBigBox1Text = rBigBox1.children.filter((c) => !!c._text);
     let rBigBox1Sprite = rBigBox1.children.filter((c) => c.isSprite && !c._text);
     rBigBox1Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
@@ -750,6 +762,7 @@ function setup() {
     rBigBox2Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
     let rBigBox2Lines = rBigBox2.children.filter((c) => !c.isSprite && !c._text);
     rBigBox2Text.forEach((txt) => (txt.style.fill = color_darkGray));
+    if (!isDebugMode) rBigBox2.alpha = 0;
 
     let rBigBox3 = createBigBoxWithText(
         "Safe Spraying Module",
@@ -766,9 +779,7 @@ function setup() {
     rBigBox3Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
     let rBigBox3Lines = rBigBox3.children.filter((c) => !c.isSprite && !c._text);
     rBigBox3Text.forEach((txt) => (txt.style.fill = color_darkGray));
-    //));
-
-    //app.ticker.add((delta) => gameLoop(delta));
+    if (!isDebugMode) rBigBox3.alpha = 0;
 
     gsap.to(logoBgCircle1, {
         pixi: { alpha: 0.2 },
@@ -1021,9 +1032,16 @@ function setup() {
             t1.fromTo(
                 [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
                 { pixi: { alpha: 0, scale: 0.1 } },
-                { duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 }
+                { delay: 1, duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
+                "stagger"
             );
-            t1.to(leftItem1, { duration: 0.35 });
+            t1.fromTo(
+                [rTxt1, rTxt2, rTxt3, rBigBox1, rBigBox2, rBigBox3],
+                { pixi: { alpha: 0, scale: 0.1 } },
+                { delay: 1, duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
+                "stagger"
+            );
+            t1.to(leftItem1, { duration: 0.3 });
         }
 
         t1.to(tri1, { duration: 0, alpha: 1 });
