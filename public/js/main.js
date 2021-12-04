@@ -7,9 +7,9 @@ if (!PIXI.utils.isWebGLSupported()) {
 }
 //PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 let dpr = window.devicePixelRatio;
-PIXI.settings.RESOLUTION = dpr < 2 ? 2 : dpr;
-//PIXI.settings.ANISOTROPIC_LEVEL = 0;
-console.log(type);
+let resolution = dpr < 2 ? 2 : dpr;
+PIXI.settings.RESOLUTION = PIXI.settings.FILTER_RESOLUTION = resolution;
+//console.log(type);
 
 const cw = 960;
 const ch = 602;
@@ -21,6 +21,7 @@ let color_lightOrange = 0xfcf4f2;
 let color_lightGray = 0xf2f2f2;
 let color_darkGray = 0xd0d0d0;
 let animate = null;
+let t1 = null;
 
 let animStateIndex = 0;
 
@@ -28,7 +29,7 @@ const app = new PIXI.Application({
     width: 960,
     height: 602,
     antialias: true,
-    transparent: true
+    backgroundAlpha: 0
 });
 
 //Add the canvas that Pixi automatically created for you to the HTML document
@@ -60,7 +61,7 @@ WebFont.load({
         families: ["Raleway:n4,n5,n6,n7"]
     },
     active: function () {
-        console.log("fonts loaded");
+        // console.log("fonts loaded");
         PIXI.Loader.shared.add(images).load(setup);
     }
 });
@@ -80,7 +81,7 @@ let createIconTextGroupItem = (textStr, textureName) => {
 
     const rectangle = new PIXI.Graphics();
     rectangle.lineStyle({ width: 2, color: 0xf1f1f1, alpha: 1 });
-    //rectangle.beginFill(0xffffff);
+    rectangle.beginFill(0xffffff);
     rectangle.drawRoundedRect(0, 0, containerW, containerH, 7);
     rectangle.endFill();
     container.addChild(rectangle);
@@ -153,13 +154,16 @@ let createTriangle = (x = 0, y = 0, fill = 0x1b823a, reverse = false) => {
     tri1.endFill();
     tri1.x = x;
     tri1.y = y;
+    tri1.alpha = 0;
     //tri1.pivot.set(7.5, -9);
     app.stage.addChild(tri1);
     return tri1;
 };
 
-let drawLine = (style, pos, points) => {
+let drawLine = (style, pos, points, fill = false) => {
     let line = new PIXI.Graphics();
+
+    if (fill) line.beginFill(fill);
     line.lineStyle(style); //eaf3ee
     line.moveTo(points[0].x, points[0].y);
 
@@ -189,6 +193,7 @@ let drawLine = (style, pos, points) => {
             path += `L${pt.x + pos.x},${pt.y + pos.y} `;
         }
     });
+    if (fill) line.endFill(fill);
 
     line.x = pos.x;
     line.y = pos.y;
@@ -201,13 +206,18 @@ let drawLine = (style, pos, points) => {
 let createBigBoxWithText = (t1, t2, t3, i1, i2, i3) => {
     let container = new PIXI.Container();
     let lineStyle3 = { width: 1, color: color_darkOrange, alpha: 1 };
-    let boxOutline = drawLine(lineStyle3, { x: 0, y: 0 }, [
+    let boxOutline = drawLine(
+        lineStyle3,
         { x: 0, y: 0 },
-        { x: 341, y: 0, curve: 22 },
-        { x: 341, y: 83, curve: 22 },
-        { x: 0, y: 83 },
-        { x: 0, y: 0 }
-    ]);
+        [
+            { x: 0, y: 0 },
+            { x: 341, y: 0, curve: 22 },
+            { x: 341, y: 83, curve: 22 },
+            { x: 0, y: 83 },
+            { x: 0, y: 0 }
+        ],
+        0xffffff
+    );
     container.addChild(boxOutline.obj);
 
     let boxLine1 = drawLine(lineStyle3, { x: 10, y: 35 }, [
@@ -332,6 +342,96 @@ let staticLogoText = function () {
     app.stage.addChild(text_paid);
 };
 
+let drawDashedLine = (points, lineStyle, dashOptions, pos) => {
+    let newPoints = [];
+    newPoints.push(points[0]);
+
+    //console.table(points);
+    //console.table(newPoints);
+    const line = app.stage.addChild(new PIXI.Graphics());
+    line.lineStyle(lineStyle); //eaf3ee
+    line.moveTo(points[0].x, points[0].y);
+
+    let getLinePoint = (p1, p2, distance) => {
+        let x = 0;
+        let y = 0;
+
+        let xDiff = p2.x - p1.x;
+        let yDiff = p2.y - p1.y;
+        let length = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        let ratio = distance / length;
+
+        x = xDiff * ratio;
+        y = yDiff * ratio;
+
+        return { x, y };
+    };
+
+    let drawDashes = (from, to) => {
+        let xDiff = to.x - from.x;
+        let yDiff = to.y - from.y;
+        let length = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        let distanceCovered = 0;
+        let ratioDsh = dashOptions[0] / length; // dash length
+        let ratioGap = dashOptions[1] / length; // gap length
+
+        let drawGap = false;
+        let curPt = { ...from };
+
+        while (distanceCovered < length) {
+            if (drawGap) {
+                let lp = getLinePoint(from, to, dashOptions[1]);
+                curPt.x += lp.x;
+                curPt.y += lp.y;
+                line.moveTo(curPt.x, curPt.y);
+                distanceCovered += dashOptions[1];
+            } else {
+                let lp = getLinePoint(from, to, dashOptions[0]);
+                curPt.x += lp.x;
+                curPt.y += lp.y;
+                line.lineTo(curPt.x, curPt.y);
+                distanceCovered += dashOptions[0];
+            }
+            drawGap = !drawGap;
+        }
+        //console.log(from, to, distance);
+    };
+
+    points.forEach((pt, i) => {
+        if (i === 0) return;
+        let ppt = points[i - 1];
+        let npt = points[i + 1];
+        if (pt.curve && i != points.length - 1) {
+            pt.curve /= 1; //2
+
+            let prevPtX = pt.x !== ppt.x ? pt.x + (ppt.x > pt.x ? pt.curve : -pt.curve) : pt.x;
+            let prevPtY = pt.y !== ppt.y ? pt.y + (ppt.y > pt.y ? pt.curve : -pt.curve) : pt.y;
+
+            let nextPtX = pt.x !== npt.x ? pt.x + (npt.x > pt.x ? pt.curve : -pt.curve) : pt.x;
+            let nextPtY = pt.y !== npt.y ? pt.y + (npt.y > pt.y ? pt.curve : -pt.curve) : pt.y;
+
+            newPoints.push({ x: prevPtX, y: prevPtY });
+            newPoints.push({ x: nextPtX, y: nextPtY });
+            drawDashes(ppt, { x: prevPtX, y: prevPtY });
+            line.moveTo(nextPtX, nextPtY);
+        } else {
+            newPoints.push(pt);
+            if (ppt.curve) {
+                //console.log(i, ppt, pt);
+                let lp = getLinePoint(ppt, pt, ppt.curve);
+                ppt.x += lp.x;
+                ppt.y += lp.y;
+                //console.log(i, ppt);
+            }
+            drawDashes(ppt, pt);
+        }
+    });
+
+    line.x = pos.x;
+    line.y = pos.y;
+    return line;
+};
+
 function setup() {
     staticLogoText();
 
@@ -345,11 +445,12 @@ function setup() {
     mainLogo.width = mainLogo.height = 52;
     app.stage.addChild(mainLogo);
 
+    let colorMatrix = new PIXI.filters.ColorMatrixFilter();
+    colorMatrix.greyscale(0.7, true);
+
     let lItemH = 58;
     let leftItem1 = createIconTextGroupItem("Map fields", "l_icon_1");
     leftItem1.position.set(15, 90);
-    //leftItem1.pivot.x = leftItem1.position.x + leftItem1.width / 2;
-    console.log(leftItem1.width);
 
     let leftItem2 = createIconTextGroupItem("Track jobs", "l_icon_2");
     leftItem2.position.set(15, 90 + lItemH * 1);
@@ -365,9 +466,17 @@ function setup() {
 
     let leftItem6 = createIconTextGroupItem("Submit hours worked", "l_icon_6");
     leftItem6.position.set(15, 400);
+    let leftItem6Sprite = leftItem6.children[1];
+    let leftItem6Text = leftItem6.children[2];
+    leftItem6Text.style.fill = color_darkGray;
+    leftItem6Sprite.filters = [colorMatrix];
 
     let leftItem7 = createIconTextGroupItem("Alerts", "l_icon_7");
     leftItem7.position.set(53, 470);
+    let leftItem7Sprite = leftItem7.children[1];
+    let leftItem7Text = leftItem7.children[2];
+    leftItem7Text.style.fill = color_darkGray;
+    leftItem7Sprite.filters = [colorMatrix];
 
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 0);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 1);
@@ -376,28 +485,31 @@ function setup() {
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 3);
     createCircle(color_lightGreen, 10, 159, 115 + lItemH * 4);
 
-    createCircle(color_lightOrange, 10, 159, 395 + lItemH / 2);
-    createCircle(color_lightOrange, 10, 316, 259);
-    createCircle(color_lightOrange, 10, 199, 465 + lItemH / 2);
-    createCircle(color_lightOrange, 10, 330, 289);
+    let lBGCircle6_1 = createCircle(color_lightGray, 10, 159, 395 + lItemH / 2);
+    let lBGCircle6_2 = createCircle(color_lightGray, 10, 319, 259);
+    let lBGCircle7_1 = createCircle(color_lightGray, 10, 199, 465 + lItemH / 2);
+    let lBGCircle7_2 = createCircle(color_lightGray, 10, 330, 289);
 
     createCircle(color_lightGreen, 10, 430, 231);
-    createCircle(color_lightOrange, 10, 430, 259);
+    let rBGCircle_l2_1 = createCircle(color_lightGray, 10, 430, 259);
 
     createCircle(color_lightGreen, 10, 575, 81);
     createCircle(color_lightGreen, 10, 575, 81 + 53);
     createCircle(color_lightGreen, 10, 575, 81 + 53 + 53);
 
-    createCircle(color_lightOrange, 10, 575, 259);
-    createCircle(color_lightOrange, 10, 575, 259 + 97);
-    createCircle(color_lightOrange, 10, 575, 259 + 97 + 97);
+    let rBGCircle4_2 = createCircle(color_lightGray, 10, 575, 259);
+    let rBGCircle5_2 = createCircle(color_lightGray, 10, 575, 259 + 97);
+    let rBGCircle6_2 = createCircle(color_lightGray, 10, 575, 259 + 97 + 97);
 
     let bgLineStyle = { width: 20, color: color_lightGreen, alpha: 1 };
     let lineStyle = { width: 2.5, color: color_darkGreen, alpha: 1 };
+    let dashLineStyle1 = { width: 2.5, color: color_lightGreen, alpha: 1 };
     let bgLineStyle2 = { width: 20, color: color_lightOrange, alpha: 1 };
     let lineStyle2 = { width: 2.5, color: color_darkOrange, alpha: 1 };
+    let dashLineStyle2 = { width: 2.5, color: color_lightOrange, alpha: 1 };
     let bgLineStyle3 = { width: 20, color: color_lightGray, alpha: 1 };
     let lineStyle3 = { width: 2.5, color: color_darkGray, alpha: 1 };
+    let dashLineStyle3 = { width: 2.5, color: color_lightGray, alpha: 1 };
     let thinLineCurve = 20;
     let leftLineX1 = 90;
     let leftLineX2 = 160;
@@ -504,7 +616,7 @@ function setup() {
     let bgRLine5 = drawLine(bgLineStyle3, { x: 430, y: 259 }, rightLine5Path);
     let bgRLine6 = drawLine(bgLineStyle3, { x: 430, y: 259 }, rightLine6Path);
 
-    let _bgRLine4 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine4Path);
+    let _bgRLine4 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine4Path); // for layering at the time of animation
     let _bgRLine5 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine5Path);
     let _bgRLine6 = drawLine(bgLineStyle2, { x: 430, y: 259 }, rightLine6Path);
 
@@ -519,14 +631,73 @@ function setup() {
     let _rLine5 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine5Path);
     let _rLine6 = drawLine(lineStyle2, { x: 430, y: 259 }, rightLine6Path);
 
+    let dashOptions = [
+        4, // space
+        10 // dash
+    ];
+    let dashedRLine1 = drawDashedLine(rightLine1Path, dashLineStyle1, dashOptions, {
+        x: 430,
+        y: 231
+    });
+    let dashedRLine2 = drawDashedLine(rightLine2Path, dashLineStyle1, dashOptions, {
+        x: 430,
+        y: 231
+    });
+    let dashedRLine3 = drawDashedLine(rightLine3Path, dashLineStyle1, dashOptions, {
+        x: 430,
+        y: 231
+    });
+    let dashedRLine4 = drawDashedLine(rightLine4Path, dashLineStyle3, dashOptions, {
+        x: 430,
+        y: 259
+    });
+    let dashedRLine5 = drawDashedLine(rightLine5Path, dashLineStyle3, dashOptions, {
+        x: 430,
+        y: 259
+    });
+    let dashedRLine6 = drawDashedLine(rightLine6Path, dashLineStyle3, dashOptions, {
+        x: 430,
+        y: 259
+    });
+
+    console.log(line1Path.slice(0, -1));
+    let dashedLine1 = drawDashedLine(line1Path.slice(0, -1), dashLineStyle1, dashOptions, {
+        x: 159,
+        y: 115 + lItemH * 0
+    });
+    let dashedLine2 = drawDashedLine(line2Path.slice(0, -1), dashLineStyle1, dashOptions, {
+        x: 159,
+        y: 115 + lItemH * 1
+    });
+    let dashedLine3 = drawDashedLine(line3Path, dashLineStyle1, dashOptions, {
+        x: 159,
+        y: 115 + lItemH * 2
+    });
+    let dashedLine4 = drawDashedLine(line4Path.slice(0, -1), dashLineStyle1, dashOptions, {
+        x: 159,
+        y: 115 + lItemH * 3
+    });
+    let dashedLine5 = drawDashedLine(line5Path.slice(0, -1), dashLineStyle1, dashOptions, {
+        x: 159,
+        y: 115 + lItemH * 4
+    });
+    let dashedLine6 = drawDashedLine(line6Path, dashLineStyle3, dashOptions, {
+        x: 159,
+        y: 395 + lItemH / 2
+    });
+    let dashedLine7 = drawDashedLine(line7Path, dashLineStyle3, dashOptions, {
+        x: 199,
+        y: 465 + lItemH / 2
+    });
+
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 0, color_darkGreen, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 1, color_darkGreen, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 2, color_darkGreen, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 3, color_darkGreen, 2.5);
     createCircle(color_lightGreen, 3, 159, 115 + lItemH * 4, color_darkGreen, 2.5);
 
-    createCircle(color_lightOrange, 3, 159, 395 + lItemH / 2, color_darkOrange, 2.5);
-    createCircle(color_lightOrange, 3, 330, 289, color_darkOrange, 2.5);
+    let lCircle6 = createCircle(color_lightOrange, 3, 159, 395 + lItemH / 2, color_darkGray, 2.5);
+    let lCircle7 = createCircle(color_lightOrange, 3, 330, 289, color_darkGray, 2.5);
 
     const tri1 = createTriangle(159, 115);
     const tri2 = createTriangle(159, 115 + lItemH * 1);
@@ -544,13 +715,6 @@ function setup() {
     const rTri5 = createTriangle(430, 259, 0xd0421f);
     const rTri6 = createTriangle(430, 259, 0xd0421f);
 
-    // { x: 430, y: 231 }
-    // { x: 430, y: 231 }
-    // { x: 430, y: 231 }
-    // { x: 430, y: 259 }
-    // { x: 430, y: 259 }
-    // { x: 430, y: 259 }
-
     let rTxt1 = createText("Fields overview", color_darkGreen, 595, 81);
     let rTxt2 = createText("Jobs and Harvest review", color_darkGreen, 595, 81 + 53);
     let rTxt3 = createText("Add product details for compliance", color_darkGreen, 595, 81 + 106);
@@ -565,6 +729,11 @@ function setup() {
     );
     rBigBox1.x = 595;
     rBigBox1.y = 220;
+    let rBigBox1Text = rBigBox1.children.filter((c) => !!c._text);
+    let rBigBox1Sprite = rBigBox1.children.filter((c) => c.isSprite && !c._text);
+    rBigBox1Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
+    let rBigBox1Lines = rBigBox1.children.filter((c) => !c.isSprite && !c._text);
+    rBigBox1Text.forEach((txt) => (txt.style.fill = color_darkGray));
 
     let rBigBox2 = createBigBoxWithText(
         "Teams and Timesheets module",
@@ -576,6 +745,11 @@ function setup() {
     );
     rBigBox2.x = 595;
     rBigBox2.y = 315;
+    let rBigBox2Text = rBigBox2.children.filter((c) => !!c._text);
+    let rBigBox2Sprite = rBigBox2.children.filter((c) => c.isSprite && !c._text);
+    rBigBox2Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
+    let rBigBox2Lines = rBigBox2.children.filter((c) => !c.isSprite && !c._text);
+    rBigBox2Text.forEach((txt) => (txt.style.fill = color_darkGray));
 
     let rBigBox3 = createBigBoxWithText(
         "Safe Spraying Module",
@@ -587,6 +761,12 @@ function setup() {
     );
     rBigBox3.x = 595;
     rBigBox3.y = 410;
+    let rBigBox3Text = rBigBox3.children.filter((c) => !!c._text);
+    let rBigBox3Sprite = rBigBox3.children.filter((c) => c.isSprite && !c._text);
+    rBigBox3Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
+    let rBigBox3Lines = rBigBox3.children.filter((c) => !c.isSprite && !c._text);
+    rBigBox3Text.forEach((txt) => (txt.style.fill = color_darkGray));
+    //));
 
     //app.ticker.add((delta) => gameLoop(delta));
 
@@ -611,24 +791,19 @@ function setup() {
         repeat: -1
     });
 
-    // gsap.fromTo(
-    //     tri1,
-    //     { pixi: { x: 170 } },
-    //     { pixi: { x: 220 }, yoyo: false, repeat: -1, duration: 2 }
-    // );
-
-    let state = -1;
-
-    let t1 = gsap.timeline({
+    t1 = gsap.timeline({
         repeat: 0,
         onComplete: () => {
-            state++;
-            state %= 4;
+            //animStateIndex++;
+            animStateIndex %= 4;
             t1.clear();
-            console.log("start again", state);
-            setTimeout(() => {
-                animate(state);
-            }, 600);
+            console.log("start again", animStateIndex);
+            setTimeout(
+                () => {
+                    animate(animStateIndex);
+                },
+                animationInitialized ? 600 : 0
+            );
         }
     });
     let animationInitialized = false;
@@ -640,6 +815,97 @@ function setup() {
         let l1PathPts = line1.path.split(" ").filter((p) => p !== "");
         let len = l1PathPts.length;
         let endPoints = `M${l1PathPts[len - 2]} ${l1PathPts[len - 1]}`;
+
+        let rightSideAnimDelay = 0.25;
+
+        t1.to(rBigBox1Lines, {
+            duration: 0,
+            pixi: { lineColor: activeState === 1 ? color_darkOrange : color_darkGray }
+        });
+        t1.to(rBigBox2Lines, {
+            duration: 0,
+            pixi: { lineColor: activeState === 2 ? color_darkOrange : color_darkGray }
+        });
+        t1.to(rBigBox3Lines, {
+            duration: 0,
+            pixi: { lineColor: activeState === 3 ? color_darkOrange : color_darkGray }
+        });
+        t1.to(rBGCircle_l2_1, {
+            duration: 0,
+            pixi: { fillColor: activeState === 0 ? color_lightGray : color_lightOrange }
+        });
+        t1.to(rBGCircle4_2, {
+            duration: 0,
+            pixi: { fillColor: activeState === 1 ? color_lightOrange : color_lightGray }
+        });
+        t1.to([lBGCircle6_1, lBGCircle6_2, rBGCircle5_2], {
+            duration: 0,
+            pixi: { fillColor: activeState === 2 ? color_lightOrange : color_lightGray }
+        });
+        t1.to(lCircle6, {
+            duration: 0,
+            pixi: { lineColor: activeState === 2 ? color_darkOrange : color_darkGray }
+        });
+        t1.to([lBGCircle7_1, lBGCircle7_2, rBGCircle6_2], {
+            duration: 0,
+            pixi: { fillColor: activeState === 3 ? color_lightOrange : color_lightGray }
+        });
+        t1.to(lCircle7, {
+            duration: 0,
+            pixi: { lineColor: activeState === 3 ? color_darkOrange : color_darkGray }
+        });
+
+        t1.to(rBigBox1Text, {
+            duration: 0,
+            onComplete: function () {
+                this._targets.forEach(
+                    (txt) =>
+                        (txt.style.fill = activeState === 1 ? color_darkOrange : color_darkGray)
+                );
+            }
+        });
+        t1.to(rBigBox1Sprite, {
+            duration: 0,
+            onComplete: function () {
+                this._targets.forEach(
+                    (sprite) => (sprite.filters = activeState === 1 ? [] : [colorMatrix])
+                );
+            }
+        });
+        t1.to(rBigBox2Text, {
+            duration: 0,
+            onComplete: function () {
+                [...this._targets, leftItem6Text].forEach(
+                    (txt) =>
+                        (txt.style.fill = activeState === 2 ? color_darkOrange : color_darkGray)
+                );
+            }
+        });
+        t1.to(rBigBox2Sprite, {
+            duration: 0,
+            onComplete: function () {
+                [...this._targets, leftItem6Sprite].forEach(
+                    (sprite) => (sprite.filters = activeState === 2 ? [] : [colorMatrix])
+                );
+            }
+        });
+        t1.to(rBigBox3Text, {
+            duration: 0,
+            onComplete: function () {
+                [...this._targets, leftItem7Text].forEach(
+                    (txt) =>
+                        (txt.style.fill = activeState === 3 ? color_darkOrange : color_darkGray)
+                );
+            }
+        });
+        t1.to(rBigBox3Sprite, {
+            duration: 0,
+            onComplete: function () {
+                [...this._targets, leftItem7Sprite].forEach(
+                    (sprite) => (sprite.filters = activeState === 3 ? [] : [colorMatrix])
+                );
+            }
+        });
 
         t1.to(rLine4.obj, {
             duration: 0.01,
@@ -755,9 +1021,17 @@ function setup() {
             t1.fromTo(
                 [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
                 { pixi: { alpha: 0, scale: 0.1 } },
-                { duration: 0.3, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 }
+                { duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 }
             );
+            t1.to(leftItem1, { duration: 0.35 });
         }
+
+        t1.to(tri1, { duration: 0, alpha: 1 });
+        t1.to(tri2, { duration: 0, alpha: 1 });
+        t1.to(tri3, { duration: 0, alpha: 1 });
+        t1.to(tri4, { duration: 0, alpha: 1 });
+        t1.to(tri5, { duration: 0, alpha: 1 });
+        t1.to(tri6, { duration: 0, alpha: activeState === 2 ? 1 : 0 });
         t1.to(tri1, {
             duration: arrDuration1,
             ease: "none",
@@ -841,13 +1115,13 @@ function setup() {
             .to(tri4, { duration: 0, alpha: 0 })
             .to(tri5, { duration: 0, alpha: 0 })
             .to(tri6, { duration: 0, alpha: 0 })
-            .to(rTri1, { delay: 0.25, duration: 0, alpha: 1 })
+            .to(rTri1, { delay: rightSideAnimDelay, duration: 0, alpha: 1 })
             .to(rTri2, { duration: 0, alpha: 1 }, "<")
             .to(rTri3, { duration: 0, alpha: 1 }, "<");
         activeState === 1 && t1.to(rTri4, { duration: 0, alpha: 1 }, "<");
         activeState === 2 && t1.to(rTri5, { duration: 0, alpha: 1 }, "<");
         activeState === 3 && t1.to(rTri6, { duration: 0, alpha: 1 }, "<");
-        t1.to(tri7, { duration: 0, alpha: 1 }, "<")
+        t1.to(tri7, { duration: 0, alpha: activeState === 3 ? 1 : 0 }, "<")
             .to(
                 rTri1,
                 {
@@ -945,16 +1219,10 @@ function setup() {
             .to(rTri1, { duration: 0.5, alpha: 1, pixi: { scale: 1 } })
             .to(rTri2, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
             .to(rTri3, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
-            .to(rTri4, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
-            .to(rTri5, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
-            .to(rTri6, { duration: 0.5, alpha: 1, pixi: { scale: 1 } }, "<")
-            .to(tri7, { duration: 0.5, alpha: 1 }, "<")
-            .to(tri1, { duration: 0, alpha: 1 })
-            .to(tri2, { duration: 0, alpha: 1 })
-            .to(tri3, { duration: 0, alpha: 1 })
-            .to(tri4, { duration: 0, alpha: 1 })
-            .to(tri5, { duration: 0, alpha: 1 })
-            .to(tri6, { duration: 0, alpha: 1 });
+            .to(rTri4, { duration: 0.5, alpha: activeState === 1 ? 1 : 0, pixi: { scale: 1 } }, "<")
+            .to(rTri5, { duration: 0.5, alpha: activeState === 2 ? 1 : 0, pixi: { scale: 1 } }, "<")
+            .to(rTri6, { duration: 0.5, alpha: activeState === 3 ? 1 : 0, pixi: { scale: 1 } }, "<")
+            .to(tri7, { duration: 0.5, alpha: activeState === 3 ? 1 : 0 }, "<");
     };
 
     // MotionPathHelper.create("#arrow", {
@@ -962,16 +1230,16 @@ function setup() {
     // });
 }
 
-function gameLoop(delta) {
-    let speed = 2;
-    folder.vx = speed;
-    folder.vy = 0; //speed;
+let animStageListElems = [...document.querySelectorAll("section.animations .stages ul li")];
+animStageListElems.forEach((stageElem, i) => {
+    stageElem.addEventListener("click", () => {
+        animStageListElems.forEach((elem) => elem.classList.remove("active"));
+        stageElem.classList.add("active");
 
-    //Apply the velocity values to the cat's
-    //position to make it move
-    folder.x += folder.vx;
-    folder.y += folder.vy;
-
-    folder.x %= 360;
-    folder.y %= 240;
-}
+        t1.clear();
+        //t1.seek(0);
+        t1.progress(1, false);
+        animStateIndex = i;
+        animate(i);
+    });
+});

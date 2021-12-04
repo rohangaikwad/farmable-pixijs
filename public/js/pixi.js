@@ -42842,4 +42842,3 @@ var PIXI = (function (exports) {
   return exports;
 
 }({}));
-//# sourceMappingURL=pixi.js.map
