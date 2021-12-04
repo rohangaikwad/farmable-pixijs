@@ -781,7 +781,7 @@ function setupAnimations() {
     rBigBox1Text.forEach((txt) => (txt.style.fill = color_darkGray));
 
     let rBigBox2 = createBigBoxWithText(
-        "Teams and Timesheets module",
+        "Teams and Timesheets Module",
         "Team management",
         "Timesheets",
         "r_icon_2",
