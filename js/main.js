@@ -1092,7 +1092,7 @@ function setupAnimations() {
 
     setTimeout(() => {
         observer.observe(target);
-    }, 000);
+    }, 1000);
 
     animate = (activeState) => {
         let arrDuration1 = 2;
