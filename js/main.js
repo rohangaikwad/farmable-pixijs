@@ -1061,7 +1061,7 @@ function setupAnimations() {
         threshold: 0.75
     };
 
-    let animationInitialized = true;
+    let animationInitialized = false;
     let initiatedFromObserver = false;
 
     let observer = new IntersectionObserver((entries, observer) => {
