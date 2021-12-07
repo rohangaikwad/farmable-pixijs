@@ -50,7 +50,9 @@ function bundle() {
         "PixiPlugin.js",
         "MotionPathPlugin.js",
         //"MotionPathHelper.min.js",
-        "pixi.js"
+        "pixi.js",
+        "pixi.filter-drop-shadow.js",
+        "pixi.filter-kawase-blur.js"
         //"pixi.dashed-line.js"
     ];
     return src(files.map((f) => `public/js/third-party/${f}`))
@@ -69,7 +71,9 @@ function bundleAll() {
         "PixiPlugin.js",
         "MotionPathPlugin.js",
         //"MotionPathHelper.min.js",
-        "pixi.js"
+        "pixi.js",
+        "pixi.filter-drop-shadow.js",
+        "pixi.filter-kawase-blur.js"
         //"pixi.dashed-line.js"
     ];
     let allFiles = [...files.map((f) => `public/js/third-party/${f}`), "public/js/main.js"];

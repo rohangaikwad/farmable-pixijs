@@ -2,6 +2,18 @@
 # yarn lockfile v1
 
 
+"@pixi/filter-drop-shadow@^4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@pixi/filter-drop-shadow/-/filter-drop-shadow-4.1.5.tgz#8eb6320ac45f1b218066ffe8e46a692a2706ba5d"
+  integrity sha512-3QmoLOfGGrdDKzarXcViWSMTeWlPXCuMy9M/sXFHWSTapBa4TQ6m1It4pv+2jGAty/dWG98l8/68vxlIFuqy7A==
+  dependencies:
+    "@pixi/filter-kawase-blur" "4.1.5"
+
+"@pixi/filter-kawase-blur@4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@pixi/filter-kawase-blur/-/filter-kawase-blur-4.1.5.tgz#c84fd3f452bfa44aaba4cba0c43a2b6071e0c6b2"
+  integrity sha512-YVzzfLoUMKYeEMuuj4TfpTJ1p14nBV/+JnWVL5dC63VuCQ1YMxzSmc6ahGNfbex0+nvhyKPWe87aO7jzX0waoA==
+
 "@trysound/sax@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
