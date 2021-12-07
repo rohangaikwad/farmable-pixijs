@@ -168,10 +168,18 @@ let createIconTextGroupItem = (textStr, textureName, num) => {
     }
 
     const rectangle = new PIXI.Graphics();
-    rectangle.lineStyle({ width: 2, color: 0xf1f1f1, alpha: 1 });
+    //rectangle.lineStyle({ width: 2, color: 0xf1f1f1, alpha: 1 });
     rectangle.beginFill(0xffffff);
-    rectangle.drawRoundedRect(0, 0, containerW, containerH, 7);
+    rectangle.drawRoundedRect(0, 0, containerW, containerH, 1);
     rectangle.endFill();
+    var dropShadowFilter = new PIXI.filters.DropShadowFilter();
+    dropShadowFilter.color = 0x444444;
+    dropShadowFilter.rotation = 90;
+    dropShadowFilter.alpha = 0.1;
+    dropShadowFilter.blur = 4;
+    dropShadowFilter.distance = 7;
+    dropShadowFilter.quality = 10;
+    rectangle.filters = [dropShadowFilter];
     container.addChild(rectangle);
 
     let icon = GetSprite(textureName); // new PIXI.Sprite(PIXI.Loader.shared.resources[textureName].texture);
@@ -533,33 +541,71 @@ let drawDashedLine = (points, lineStyle, dashOptions, pos) => {
         //console.log(from, to, distance);
     };
 
+    let curPos = points[0];
+    //console.log(points);
+
+    let getLength = (from, to) => {
+        let xDiff = to.x - from.x;
+        let yDiff = to.y - from.y;
+        return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+    };
+
+    let dshLen = dashOptions[0];
+    let gapLen = dashOptions[1];
+    //let drawDash = true;
+
     points.forEach((pt, i) => {
-        if (i === 0) return;
-        let ppt = points[i - 1];
-        let npt = points[i + 1];
-        if (pt.curve && i != points.length - 1) {
-            pt.curve /= 1; //2
+        let drawDash = true;
+        pt = { ...pt };
+        let nPt = points[i + 1];
+        if (nPt) {
+            nPt = { ...nPt };
+        }
+        let curLen = 0;
+        if (nPt) {
+            let lineLength = getLength(pt, nPt);
 
-            let prevPtX = pt.x !== ppt.x ? pt.x + (ppt.x > pt.x ? pt.curve : -pt.curve) : pt.x;
-            let prevPtY = pt.y !== ppt.y ? pt.y + (ppt.y > pt.y ? pt.curve : -pt.curve) : pt.y;
-
-            let nextPtX = pt.x !== npt.x ? pt.x + (npt.x > pt.x ? pt.curve : -pt.curve) : pt.x;
-            let nextPtY = pt.y !== npt.y ? pt.y + (npt.y > pt.y ? pt.curve : -pt.curve) : pt.y;
-
-            newPoints.push({ x: prevPtX, y: prevPtY });
-            newPoints.push({ x: nextPtX, y: nextPtY });
-            drawDashes(ppt, { x: prevPtX, y: prevPtY });
-            line.moveTo(nextPtX, nextPtY);
-        } else {
-            newPoints.push(pt);
-            if (ppt.curve) {
-                //console.log(i, ppt, pt);
-                let lp = getLinePoint(ppt, pt, ppt.curve);
-                ppt.x += lp.x;
-                ppt.y += lp.y;
-                //console.log(i, ppt);
+            if (nPt.curve) {
+                let newPt = getLinePoint(pt, nPt, nPt.curve);
+                nPt.x -= newPt.x;
+                nPt.y -= newPt.y;
+                lineLength -= nPt.curve;
+                console.log(i, pt, newPt, nPt);
+                //createCircle(color_darkGreen, 3, nPt.x + pos.x, nPt.y + pos.y);
             }
-            drawDashes(ppt, pt);
+            if (pt.curve) {
+                let newPt = getLinePoint(pt, nPt, pt.curve);
+                //console.log(i, pt, newPt);
+                pt.x += newPt.x;
+                pt.y += newPt.y;
+                lineLength -= pt.curve;
+                console.log(i, pt, newPt, nPt);
+                line.moveTo(pt.x, pt.y);
+                curPos = pt;
+                //createCircle(color_darkOrange, 3, pt.x + pos.x, pt.y + pos.y);
+            }
+
+            while (curLen < lineLength) {
+                let len = drawDash ? dshLen : gapLen;
+                let newPt = getLinePoint(pt, nPt, len);
+                curPos.x += newPt.x;
+                curPos.y += newPt.y;
+
+                //curPos.x = curPos.x > nPt.x ? nPt.x : curPos.x;
+                //curPos.y = curPos.y > nPt.y ? nPt.y : curPos.y;
+
+                if (drawDash) {
+                    line.lineTo(curPos.x, curPos.y);
+
+                    //console.log("lineTo", i, curPos.x, curPos.y);
+                } else {
+                    line.moveTo(curPos.x, curPos.y);
+                }
+                drawDash = !drawDash;
+                curLen += len;
+            }
+
+            line.moveTo(nPt.x, nPt.y);
         }
     });
 
@@ -569,6 +615,25 @@ let drawDashedLine = (points, lineStyle, dashOptions, pos) => {
 };
 
 function setupAnimations() {
+    // let line1Pathx = [
+    //     { x: 0, y: 0 },
+    //     { x: 100, y: 0, curve: 10 },
+    //     { x: 100, y: 90, curve: 10 },
+    //     { x: 200, y: 90 }
+    // ];
+    // drawLine(
+    //     { width: 2.5, color: 0x00ffff, alpha: 1 },
+    //     {
+    //         x: 100,
+    //         y: 100
+    //     },
+    //     line1Pathx
+    // );
+    // drawDashedLine(line1Pathx, { width: 2.5, color: 0xffffff, alpha: 1 }, [4, 12], {
+    //     x: 100,
+    //     y: 100
+    // });
+    //return;
     let isDebugMode = false;
     setupStaticLogoText();
 
@@ -693,7 +758,7 @@ function setupAnimations() {
     let bgLineStyle3 = { width: 20, color: color_lightGray, alpha: 1 };
     let lineStyle3 = { width: 2.5, color: color_darkGray, alpha: 1 };
     let dashLineStyle3 = { width: 2.5, color: color_lightGray, alpha: 1 };
-    let thinLineCurve = 20;
+    let thinLineCurve = 10;
     let leftLineX1 = 90;
     let leftLineX2 = 160;
 
@@ -845,7 +910,7 @@ function setupAnimations() {
 
     let dashOptions = [
         4, // space
-        10 // dash
+        9 // dash
     ];
     let dashedRLine1 = drawDashedLine(rightLine1Path, dashLineStyle1, dashOptions, {
         x: rLinePathX,
@@ -877,7 +942,7 @@ function setupAnimations() {
         x: lCircleXPos,
         y: 115 + lItemH * 0
     });
-    let dashedLine2 = drawDashedLine(line2Path.slice(0, -1), dashLineStyle1, dashOptions, {
+    let dashedLine2 = drawDashedLine(line2Path.slice(0, -2), dashLineStyle1, dashOptions, {
         x: lCircleXPos,
         y: 115 + lItemH * 1
     });
@@ -885,7 +950,7 @@ function setupAnimations() {
         x: lCircleXPos,
         y: 115 + lItemH * 2
     });
-    let dashedLine4 = drawDashedLine(line4Path.slice(0, -1), dashLineStyle1, dashOptions, {
+    let dashedLine4 = drawDashedLine(line4Path.slice(0, -2), dashLineStyle1, dashOptions, {
         x: lCircleXPos,
         y: 115 + lItemH * 3
     });
