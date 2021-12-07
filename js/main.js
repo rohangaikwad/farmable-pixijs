@@ -6,7 +6,7 @@ gsap.registerPlugin(MotionPathPlugin);
 //     type = "canvas";
 // }
 
-let langCode = "es";
+let langCode = "en";
 
 (() => {
     let searchText = window.location.search;
