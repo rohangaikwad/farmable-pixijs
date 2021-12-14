@@ -168,18 +168,18 @@ let createIconTextGroupItem = (textStr, textureName, num) => {
     }
 
     const rectangle = new PIXI.Graphics();
-    //rectangle.lineStyle({ width: 2, color: 0xf1f1f1, alpha: 1 });
+    rectangle.lineStyle({ width: 1, color: 0xf1f1f1, alpha: 1 });
     rectangle.beginFill(0xffffff);
     rectangle.drawRoundedRect(0, 0, containerW, containerH, 1);
     rectangle.endFill();
-    var dropShadowFilter = new PIXI.filters.DropShadowFilter();
-    dropShadowFilter.color = 0x444444;
-    dropShadowFilter.rotation = 90;
-    dropShadowFilter.alpha = 0.1;
-    dropShadowFilter.blur = 4;
-    dropShadowFilter.distance = 7;
-    dropShadowFilter.quality = 10;
-    rectangle.filters = [dropShadowFilter];
+    // var dropShadowFilter = new PIXI.filters.DropShadowFilter();
+    // dropShadowFilter.color = 0x444444;
+    // dropShadowFilter.rotation = 90;
+    // dropShadowFilter.alpha = 0.1;
+    // dropShadowFilter.blur = 4;
+    // dropShadowFilter.distance = 7;
+    // dropShadowFilter.quality = 10;
+    // rectangle.filters = [dropShadowFilter];
     container.addChild(rectangle);
 
     let icon = GetSprite(textureName); // new PIXI.Sprite(PIXI.Loader.shared.resources[textureName].texture);
@@ -241,12 +241,13 @@ let createTriangle = (x = 0, y = 0, fill = 0x1b823a, reverse = false) => {
     tri1.beginFill(fill);
     let w = 15;
     let h = 18;
-    if (reverse) {
-        tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
-        //tri1.drawPolygon([w / 2, -h / 2, -w / 2, 0, w / 2, h / 2, w / 2 - 3, 0]);
-    } else {
-        tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
-    }
+    tri1.drawCircle(0, 0, 5);
+    // if (reverse) {
+    //     tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
+    //     //tri1.drawPolygon([w / 2, -h / 2, -w / 2, 0, w / 2, h / 2, w / 2 - 3, 0]);
+    // } else {
+    //     tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
+    // }
     tri1.endFill();
     tri1.x = x;
     tri1.y = y;
@@ -1157,10 +1158,10 @@ function setupAnimations() {
 
     setTimeout(() => {
         observer.observe(target);
-    }, 1000);
+    }, 500);
 
     animate = (activeState) => {
-        let arrDuration1 = 2;
+        let arrDuration1 = 1.5;
         let arrDuration2 = arrDuration1 / 3;
 
         let l1PathPts = line1.path.split(" ").filter((p) => p !== "");
@@ -1174,13 +1175,13 @@ function setupAnimations() {
             t1.fromTo(
                 [leftItem1, leftItem2, leftItem3, leftItem4, leftItem5, leftItem6, leftItem7],
                 { pixi: { alpha: 0, scale: 0.1 } },
-                { duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
+                { duration: 0.35, pixi: { alpha: 1, scale: 1 }, stagger: 0.03 },
                 "stagger"
             );
             t1.fromTo(
                 [rTxt1, rTxt2, rTxt3, rBigBox1, rBigBox2, rBigBox3],
                 { pixi: { alpha: 0, scale: 0.1 } },
-                { duration: 0.5, pixi: { alpha: 1, scale: 1 }, stagger: 0.1 },
+                { duration: 0.35, pixi: { alpha: 1, scale: 1 }, stagger: 0.03 },
                 "stagger"
             );
             t1.fromTo(
@@ -1200,13 +1201,13 @@ function setupAnimations() {
                     rLine6.obj
                 ],
                 { pixi: { alpha: 0 } },
-                { duration: 0.5, pixi: { alpha: 1 }, stagger: 0.05 }
+                { duration: 0.35, pixi: { alpha: 1 }, stagger: 0.02 }
             );
 
             t1.to(
                 [lCircle1, lCircle2, lCircle3, lCircle4, lCircle5, lCircle6, lCircle7],
                 {
-                    duration: 0.5,
+                    duration: 0.35,
                     pixi: { alpha: 1 },
                     stagger: 0.05
                 },
