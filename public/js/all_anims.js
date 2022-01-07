@@ -1,11 +1,6 @@
 gsap.registerPlugin(PixiPlugin);
 gsap.registerPlugin(MotionPathPlugin);
 
-// let type = "WebGL";
-// if (!PIXI.utils.isWebGLSupported()) {
-//     type = "canvas";
-// }
-
 let langCode = "en";
 
 (() => {
@@ -266,12 +261,6 @@ let createTriangle = (x = 0, y = 0, fill = 0x1b823a, reverse = false) => {
     let w = 15;
     let h = 18;
     tri1.drawCircle(0, 0, 5);
-    // if (reverse) {
-    //     tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
-    //     //tri1.drawPolygon([w / 2, -h / 2, -w / 2, 0, w / 2, h / 2, w / 2 - 3, 0]);
-    // } else {
-    //     tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
-    // }
     tri1.endFill();
     tri1.x = x;
     tri1.y = y;
@@ -645,25 +634,6 @@ let drawDashedLine = (points, lineStyle, dashOptions, pos) => {
 };
 
 function setupAnimations() {
-    // let line1Pathx = [
-    //     { x: 0, y: 0 },
-    //     { x: 100, y: 0, curve: 10 },
-    //     { x: 100, y: 90, curve: 10 },
-    //     { x: 200, y: 90 }
-    // ];
-    // drawLine(
-    //     { width: 2.5, color: 0x00ffff, alpha: 1 },
-    //     {
-    //         x: 100,
-    //         y: 100
-    //     },
-    //     line1Pathx
-    // );
-    // drawDashedLine(line1Pathx, { width: 2.5, color: 0xffffff, alpha: 1 }, [4, 12], {
-    //     x: 100,
-    //     y: 100
-    // });
-    //return;
     let isDebugMode = false;
     setupStaticLogoText();
 
