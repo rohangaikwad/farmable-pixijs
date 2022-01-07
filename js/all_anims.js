@@ -1,11 +1,6 @@
 gsap.registerPlugin(PixiPlugin);
 gsap.registerPlugin(MotionPathPlugin);
 
-// let type = "WebGL";
-// if (!PIXI.utils.isWebGLSupported()) {
-//     type = "canvas";
-// }
-
 let langCode = "en";
 
 (() => {
@@ -103,8 +98,6 @@ let color_darkGray = 0xd0d0d0;
 let animate = null;
 let t1 = null;
 
-let animStateIndex = 0;
-
 const app = new PIXI.Application({
     width: 960,
     height: 602,
@@ -196,14 +189,14 @@ let createIconTextGroupItem = (textStr, textureName, num) => {
     rectangle.beginFill(0xffffff);
     rectangle.drawRoundedRect(0, 0, containerW, containerH, 1);
     rectangle.endFill();
-    // var dropShadowFilter = new PIXI.filters.DropShadowFilter();
-    // dropShadowFilter.color = 0x444444;
-    // dropShadowFilter.rotation = 90;
-    // dropShadowFilter.alpha = 0.1;
-    // dropShadowFilter.blur = 4;
-    // dropShadowFilter.distance = 7;
-    // dropShadowFilter.quality = 10;
-    // rectangle.filters = [dropShadowFilter];
+    var dropShadowFilter = new PIXI.filters.DropShadowFilter();
+    dropShadowFilter.color = 0x444444;
+    dropShadowFilter.rotation = 90;
+    dropShadowFilter.alpha = 0.1;
+    dropShadowFilter.blur = 4;
+    dropShadowFilter.distance = 7;
+    dropShadowFilter.quality = 10;
+    rectangle.filters = [dropShadowFilter];
     container.addChild(rectangle);
 
     let icon = GetSprite(textureName); // new PIXI.Sprite(PIXI.Loader.shared.resources[textureName].texture);
@@ -268,12 +261,6 @@ let createTriangle = (x = 0, y = 0, fill = 0x1b823a, reverse = false) => {
     let w = 15;
     let h = 18;
     tri1.drawCircle(0, 0, 5);
-    // if (reverse) {
-    //     tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
-    //     //tri1.drawPolygon([w / 2, -h / 2, -w / 2, 0, w / 2, h / 2, w / 2 - 3, 0]);
-    // } else {
-    //     tri1.drawPolygon([-w / 2, -h / 2, w / 2, 0, -w / 2, h / 2, -w / 2 + 3, 0]);
-    // }
     tri1.endFill();
     tri1.x = x;
     tri1.y = y;
@@ -328,7 +315,7 @@ let drawLine = (style, pos, points, fill = false) => {
 
 let createBigBoxWithText = (t1, t2, t3, i1, i2, i3, boxNum) => {
     let container = new PIXI.Container();
-    let lineStyle3 = { width: 1, color: color_darkGray, alpha: 1 };
+    let lineStyle3 = { width: 1, color: color_darkOrange, alpha: 1 };
     let boxHt = 83;
     if (langCode !== "en" && boxNum !== 1) {
         boxHt = 105;
@@ -647,25 +634,6 @@ let drawDashedLine = (points, lineStyle, dashOptions, pos) => {
 };
 
 function setupAnimations() {
-    // let line1Pathx = [
-    //     { x: 0, y: 0 },
-    //     { x: 100, y: 0, curve: 10 },
-    //     { x: 100, y: 90, curve: 10 },
-    //     { x: 200, y: 90 }
-    // ];
-    // drawLine(
-    //     { width: 2.5, color: 0x00ffff, alpha: 1 },
-    //     {
-    //         x: 100,
-    //         y: 100
-    //     },
-    //     line1Pathx
-    // );
-    // drawDashedLine(line1Pathx, { width: 2.5, color: 0xffffff, alpha: 1 }, [4, 12], {
-    //     x: 100,
-    //     y: 100
-    // });
-    //return;
     let isDebugMode = false;
     setupStaticLogoText();
 
@@ -1094,9 +1062,9 @@ function setupAnimations() {
     if (!isDebugMode) rBigBox1.alpha = 0;
     let rBigBox1Text = rBigBox1.children.filter((c) => !!c._text);
     let rBigBox1Sprite = rBigBox1.children.filter((c) => c.isSprite && !c._text);
-    rBigBox1Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
+    //rBigBox1Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
     let rBigBox1Lines = rBigBox1.children.filter((c) => !c.isSprite && !c._text);
-    rBigBox1Text.forEach((txt) => (txt.style.fill = color_darkGray));
+    //rBigBox1Text.forEach((txt) => (txt.style.fill = color_darkGray));
 
     let rb2Height = 95;
     let rBigBox2 = createBigBoxWithText(
@@ -1110,9 +1078,9 @@ function setupAnimations() {
     rBigBox2.y = 220 + rb1Height;
     let rBigBox2Text = rBigBox2.children.filter((c) => !!c._text);
     let rBigBox2Sprite = rBigBox2.children.filter((c) => c.isSprite && !c._text);
-    rBigBox2Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
+    //rBigBox2Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
     let rBigBox2Lines = rBigBox2.children.filter((c) => !c.isSprite && !c._text);
-    rBigBox2Text.forEach((txt) => (txt.style.fill = color_darkGray));
+    //rBigBox2Text.forEach((txt) => (txt.style.fill = color_darkGray));
     if (!isDebugMode) rBigBox2.alpha = 0;
 
     let rBigBox3 = createBigBoxWithText(
@@ -1126,9 +1094,9 @@ function setupAnimations() {
     rBigBox3.y = 220 + rb1Height + rb2Height;
     let rBigBox3Text = rBigBox3.children.filter((c) => !!c._text);
     let rBigBox3Sprite = rBigBox3.children.filter((c) => c.isSprite && !c._text);
-    rBigBox3Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
+    //rBigBox3Sprite.forEach((sprite) => (sprite.filters = [colorMatrix]));
     let rBigBox3Lines = rBigBox3.children.filter((c) => !c.isSprite && !c._text);
-    rBigBox3Text.forEach((txt) => (txt.style.fill = color_darkGray));
+    //rBigBox3Text.forEach((txt) => (txt.style.fill = color_darkGray));
     if (!isDebugMode) rBigBox3.alpha = 0;
 
     gsap.to(logoBgCircle1, {
@@ -1170,13 +1138,10 @@ function setupAnimations() {
                 t1 = gsap.timeline({
                     repeat: 0,
                     onComplete: () => {
-                        //animStateIndex++;
-                        animStateIndex %= 4;
                         t1.clear();
-                        console.log("start again", animStateIndex);
                         setTimeout(
                             () => {
-                                animate(animStateIndex);
+                                animate();
                             },
                             animationInitialized ? 600 : 0
                         );
@@ -1191,7 +1156,7 @@ function setupAnimations() {
         observer.observe(target);
     }, 500);
 
-    animate = (activeState) => {
+    animate = () => {
         let arrDuration1 = 1.5;
         let arrDuration2 = arrDuration1 / 3;
 
@@ -1685,16 +1650,16 @@ function setupAnimations() {
     // });
 }
 
-let animStageListElems = [...document.querySelectorAll("section.animations .stages ul li")];
-animStageListElems.forEach((stageElem, i) => {
-    stageElem.addEventListener("click", () => {
-        animStageListElems.forEach((elem) => elem.classList.remove("active"));
-        stageElem.classList.add("active");
+// let animStageListElems = [...document.querySelectorAll("section.animations .stages ul li")];
+// animStageListElems.forEach((stageElem, i) => {
+//     stageElem.addEventListener("click", () => {
+//         animStageListElems.forEach((elem) => elem.classList.remove("active"));
+//         stageElem.classList.add("active");
 
-        t1.clear();
-        //t1.seek(0);
-        t1.progress(1, false);
-        animStateIndex = i;
-        animate(i);
-    });
-});
+//         t1.clear();
+//         //t1.seek(0);
+//         t1.progress(1, false);
+//         animStateIndex = i;
+//         animate(i);
+//     });
+// });
