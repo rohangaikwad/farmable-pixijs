@@ -52,7 +52,8 @@ function bundle() {
         //"MotionPathHelper.min.js",
         "pixi.js",
         "pixi.filter-drop-shadow.js",
-        "pixi.filter-kawase-blur.js"
+        "pixi.filter-kawase-blur.js",
+        "viewport.min.js"
         //"pixi.dashed-line.js"
     ];
     return src(files.map((f) => `public/js/third-party/${f}`))
@@ -62,8 +63,8 @@ function bundle() {
         .pipe(rename("gsap_pixi_bundle.min.js"))
         .pipe(dest("./public/js/"));
 }
-
 exports.bundle = bundle;
+
 function bundleAll() {
     let files = [
         "webfont.js",
@@ -73,7 +74,8 @@ function bundleAll() {
         //"MotionPathHelper.min.js",
         "pixi.js",
         "pixi.filter-drop-shadow.js",
-        "pixi.filter-kawase-blur.js"
+        "pixi.filter-kawase-blur.js",
+        "viewport.min.js"
         //"pixi.dashed-line.js"
     ];
     let allFiles = [...files.map((f) => `public/js/third-party/${f}`), "public/js/main.js"];
@@ -84,7 +86,30 @@ function bundleAll() {
         .pipe(rename("bundle.min.js"))
         .pipe(dest("./public/js/"));
 }
-
 exports.bundleAll = bundleAll;
+
+function bundleAllAnims() {
+    let files = [
+        "webfont.js",
+        "gsap.js",
+        "PixiPlugin.js",
+        "MotionPathPlugin.js",
+        //"MotionPathHelper.min.js",
+        "pixi.js",
+        "pixi.filter-drop-shadow.js",
+        "pixi.filter-kawase-blur.js",
+        "viewport.min.js"
+        //"pixi.dashed-line.js"
+    ];
+    let allFiles = [...files.map((f) => `public/js/third-party/${f}`), "public/js/all_anims.js"];
+    return src(allFiles)
+        .pipe(concat("bundle.js"))
+        .pipe(dest("./public/js/"))
+        .pipe(terser())
+        .pipe(rename("all_anims_bundle.min.js"))
+        .pipe(dest("./public/js/"));
+}
+exports.bundleAllAnims = bundleAllAnims;
+
 // Default Gulp task
-exports.default = series(scssTask, browsersyncServe, watchTask);
+exports.default = series(scssTask, browsersyncServe, watchTask, bundleAllAnims);
