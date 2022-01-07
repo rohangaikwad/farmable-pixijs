@@ -104,29 +104,8 @@ const app = new PIXI.Application({
     antialias: true,
     backgroundAlpha: 0
 });
-const viewport = new pixi_viewport.Viewport({
-    screenWidth: window.innerWidth,
-    screenHeight: window.innerHeight,
-    worldWidth: 960,
-    worldHeight: 602,
-
-    interaction: app.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
-});
 
 let textElemList = [];
-
-app.stage.addChild(viewport);
-if (window.innerWidth < 1025) {
-    viewport.drag().pinch().wheel().clampZoom({ minScale: 1 }); //.decelerate();
-}
-viewport.on("zoomed-end", () => {
-    console.log("zoomed");
-    let res = viewport.scaled < 2 ? 2 : viewport.scaled;
-
-    textElemList.forEach((t) => {
-        t.resolution = res;
-    });
-});
 
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.getElementById("animation-container").appendChild(app.view);
@@ -223,7 +202,15 @@ let createIconTextGroupItem = (textStr, textureName, num) => {
     viewport.addChild(container);
     return container;
 };
+const viewport = new pixi_viewport.Viewport({
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+    worldWidth: 960,
+    worldHeight: 602,
 
+    interaction: app.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
+});
+app.stage.addChild(viewport);
 let createText = (textStr, txtColor, x, y) => {
     const textLabel = new PIXI.Text(textStr, {
         fontFamily: "Raleway",
@@ -312,6 +299,15 @@ let drawLine = (style, pos, points, fill = false) => {
     //console.log(path);
     return { obj: line, path };
 };
+
+viewport.on("zoomed-end", () => {
+    console.log("zoomed");
+    let res = viewport.scaled < 2 ? 2 : viewport.scaled;
+
+    textElemList.forEach((t) => {
+        t.resolution = res;
+    });
+});
 
 let createBigBoxWithText = (t1, t2, t3, i1, i2, i3, boxNum) => {
     let container = new PIXI.Container();
@@ -505,6 +501,9 @@ let setupStaticLogoText = function () {
     viewport.addChild(text_paid);
 };
 
+if (window.innerWidth < 1025) {
+    viewport.drag().pinch().wheel().clampZoom({ minScale: 1 }); //.decelerate();
+}
 let drawDashedLine = (points, lineStyle, dashOptions, pos) => {
     let newPoints = [];
     newPoints.push(points[0]);
