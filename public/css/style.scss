@@ -3,7 +3,10 @@
 }
 @import "fonts";
 
-body { margin: 0; background: linear-gradient(0deg, #FAFAFA, #FAFAFA); font-family: 'Raleway', sans-serif;}
+body {
+    margin: 0; font-family: 'Raleway', sans-serif;
+    //background: linear-gradient(0deg, #FAFAFA, #FAFAFA);
+}
 
 .bg {
     margin: 0 auto; text-align: center;
@@ -13,6 +16,7 @@ body { margin: 0; background: linear-gradient(0deg, #FAFAFA, #FAFAFA); font-fami
 
 .container {
     max-width: 100%; width: 1366px; margin: 0 auto;
+    @media (max-width: 1024px) { padding: 0 5px; }
 }
 section.heading {
     text-align: center;
